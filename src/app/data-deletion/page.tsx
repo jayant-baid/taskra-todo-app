@@ -3,7 +3,8 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Data Deletion – Recurring // OPS",
-  description: "Instructions to delete your Recurring // OPS account and all associated data.",
+  description:
+    "Instructions to delete your Recurring // OPS account and all associated data.",
 };
 
 export default function DataDeletion() {
@@ -24,7 +25,9 @@ export default function DataDeletion() {
           <h1 className="text-2xl font-bold text-[#E4E6EB] mb-2">
             Data Deletion Instructions
           </h1>
-          <p className="text-xs text-[#8B92A3]">Last updated: September 8, 2026</p>
+          <p className="text-xs text-[#8B92A3]">
+            Last updated: September 8, 2026
+          </p>
         </div>
 
         <div className="flex flex-col gap-8 text-sm leading-relaxed text-[#C8CDD8]">
@@ -49,17 +52,18 @@ export default function DataDeletion() {
                 and sign in.
               </li>
               <li>
-                Click the <strong className="text-[#E4E6EB]">Remove All Data</strong>{" "}
+                Click the{" "}
+                <strong className="text-[#E4E6EB]">Remove All Data</strong>{" "}
                 button in the top toolbar to delete all your tasks.
               </li>
               <li>
-                Click the <strong className="text-[#E4E6EB]">Log Out</strong> icon
-                next to your username.
+                Click the <strong className="text-[#E4E6EB]">Log Out</strong>{" "}
+                icon next to your username.
               </li>
             </ol>
             <p className="mt-3 text-[#8B92A3] text-xs">
-              This removes your tasks. To delete your full account record (including
-              your name, email, and provider ID), use Option 2 below.
+              This removes your tasks. To delete your full account record
+              (including your name, email, and provider ID), use Option 2 below.
             </p>
           </section>
 
@@ -69,9 +73,9 @@ export default function DataDeletion() {
               Option 2 — Request Full Account Deletion
             </h2>
             <p>
-              To permanently delete your account and all associated data
-              (name, email, Facebook ID, session tokens, and task history),
-              open an issue on our GitHub repository and include the phrase{" "}
+              To permanently delete your account and all associated data (name,
+              email, Facebook ID, session tokens, and task history), open an
+              issue on our GitHub repository and include the phrase{" "}
               <code className="bg-[#1C1F26] px-1 py-0.5 rounded text-[#5B7FFF] text-xs">
                 delete my account
               </code>{" "}
