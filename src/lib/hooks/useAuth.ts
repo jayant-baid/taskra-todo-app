@@ -26,12 +26,32 @@ export function useAuthInternal() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
+  const [oauthError, setOauthError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
     const initAuth = async () => {
       try {
-        const storedToken = getClientToken();
+        let storedToken = getClientToken();
+
+        // Check if returning from OAuth callback with token in query params
+        if (typeof window !== "undefined") {
+          const urlParams = new URLSearchParams(window.location.search);
+          const urlToken = urlParams.get("token");
+          const authSuccess = urlParams.get("auth_success");
+          const authError = urlParams.get("auth_error");
+
+          if (authError) {
+            console.warn("[useAuth] OAuth error returned:", authError);
+            if (isMounted) setOauthError(authError);
+            window.history.replaceState({}, "", window.location.pathname);
+          } else if (urlToken && authSuccess) {
+            storedToken = urlToken;
+            setClientToken(urlToken);
+            window.history.replaceState({}, "", window.location.pathname);
+          }
+        }
+
         if (!isMounted) return;
         setToken(storedToken);
 
@@ -143,5 +163,7 @@ export function useAuthInternal() {
     register,
     logout,
     token,
+    oauthError,
+    clearOauthError: () => setOauthError(null),
   };
 }

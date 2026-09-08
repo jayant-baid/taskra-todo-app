@@ -3,8 +3,6 @@
 import React, { useState, useEffect } from "react";
 import {
   Plus,
-  Database,
-  Radio,
   Trash2,
   LogIn,
   LogOut,
@@ -47,6 +45,8 @@ export default function Home() {
     login,
     register,
     logout,
+    oauthError,
+    clearOauthError,
   } = useAuthInternal();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -54,6 +54,14 @@ export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
   const [mobileTab, setMobileTab] = useState<"tasks" | "analytics">("tasks");
+
+  // Open Auth Modal if OAuth returned an error
+  useEffect(() => {
+    if (oauthError) {
+      const t = setTimeout(() => setIsAuthModalOpen(true), 0);
+      return () => clearTimeout(t);
+    }
+  }, [oauthError]);
 
   // Global keyboard shortcut: 'N' to open Add Task modal (when not typing in an input)
   useEffect(() => {
@@ -116,17 +124,31 @@ export default function Home() {
 
         {/* System, Auth, and Action Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Storage indicators */}
-          <div className="hidden xl:flex items-center gap-2 text-[11px] text-[#8B92A3]">
-            <span className="flex items-center gap-1 bg-[#14161A] px-2 py-0.5 rounded-[2px] border border-[#2A2E37]">
-              <Database size={11} className="text-[#3DD68C]" />
-              <span>IndexedDB</span>
+          {/* Remove All Data Button (triggers confirmation popup) */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsRemoveAllModalOpen(true)}
+            className="text-xs text-[#8B92A3] hover:text-[#FF6B6B] hover:bg-[#FF6B6B]/10 gap-1.5"
+            title="Remove all current and upcoming tasks"
+          >
+            <Trash2 size={13} />
+            <span className="hidden lg:inline">Remove All Data</span>
+          </Button>
+
+          {/* New Task Button */}
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setIsAddModalOpen(true)}
+            className="gap-1.5"
+          >
+            <Plus size={14} />
+            <span className="hidden lg:inline">New Task</span>
+            <span className="hidden md:inline text-[10px] bg-white/20 px-1 py-0.2 rounded font-mono">
+              N
             </span>
-            <span className="flex items-center gap-1 bg-[#14161A] px-2 py-0.5 rounded-[2px] border border-[#2A2E37]">
-              <Radio size={11} className="text-[#5B7FFF]" />
-              <span>BroadcastChannel</span>
-            </span>
-          </div>
+          </Button>
 
           {/* User Auth Status / Sign In Button */}
           {!isAuthLoading && (
@@ -168,32 +190,6 @@ export default function Home() {
               )}
             </>
           )}
-
-          {/* Remove All Data Button (triggers confirmation popup) */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsRemoveAllModalOpen(true)}
-            className="text-xs text-[#8B92A3] hover:text-[#FF6B6B] hover:bg-[#FF6B6B]/10 gap-1.5"
-            title="Remove all current and upcoming tasks"
-          >
-            <Trash2 size={13} />
-            <span className="hidden md:inline">Remove All Data</span>
-          </Button>
-
-          {/* New Task Button */}
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => setIsAddModalOpen(true)}
-            className="gap-1.5"
-          >
-            <Plus size={14} />
-            <span className="hidden xs:inline">New Task</span>
-            <span className="hidden sm:inline text-[10px] bg-white/20 px-1 py-0.2 rounded font-mono">
-              N
-            </span>
-          </Button>
         </div>
       </header>
 
@@ -295,7 +291,11 @@ export default function Home() {
       {/* Authentication Modal (Sign In / Register) */}
       <AuthModal
         isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
+        onClose={() => {
+          setIsAuthModalOpen(false);
+          clearOauthError();
+        }}
+        initialError={oauthError}
         onSuccess={handleAuthSuccess}
         login={login}
         register={register}
