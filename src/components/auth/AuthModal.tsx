@@ -78,7 +78,7 @@ export function AuthModal({
     setError(null);
   };
 
-  const handleSocialAuth = (provider: 'google' | 'facebook') => {
+  const handleSocialAuth = (provider: "google" | "facebook") => {
     setError(null);
     setIsSocialLoading(provider);
     // Direct top-level browser navigation to OAuth redirect endpoint
