@@ -1,26 +1,85 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-app: #14161A;
+  --bg-surface: #1C1F26;
+  --bg-surface-subtle: #222630;
+  --border-subtle: #2A2E37;
+  --border-strong: #383E4C;
+  --text-primary: #E4E6EB;
+  --text-secondary: #8B92A3;
+  --text-muted: #5C6272;
+  
+  --accent-primary: #5B7FFF;
+  --accent-subtle: rgba(91, 127, 255, 0.12);
+  
+  --status-completed: #3DD68C;
+  --status-completed-bg: rgba(61, 214, 140, 0.12);
+  --status-pending: #E8B339;
+  --status-pending-bg: rgba(232, 179, 57, 0.12);
+  --status-danger: #FF6B6B;
+  --status-danger-bg: rgba(255, 107, 107, 0.12);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg-app: var(--bg-app);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-surface-subtle: var(--bg-surface-subtle);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-status-completed: var(--status-completed);
+  --color-status-pending: var(--status-pending);
+  --color-status-danger: var(--status-danger);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tabular figures for numbers, counts, streaks, progress */
+.tabular-nums,
+[data-tabular="true"],
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Linear-ops scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
+
+/* Dialog and popover backdrop */
+dialog::backdrop {
+  background: rgba(10, 12, 16, 0.75);
+  backdrop-filter: blur(2px);
 }
