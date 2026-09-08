@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function DataDeletion() {
   return (
-    <div className="min-h-screen bg-[#14161A] text-[#E4E6EB] px-4 py-12">
+    <div className="h-full overflow-y-auto bg-[#14161A] text-[#E4E6EB] px-4 py-12">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-10">
@@ -33,8 +33,8 @@ export default function DataDeletion() {
         <div className="flex flex-col gap-8 text-sm leading-relaxed text-[#C8CDD8]">
           <section>
             <p>
-              If you signed in to Taskra using Facebook and would like
-              to delete all data we hold about you, follow the steps below.
+              If you signed in to Taskra using Facebook and would like to delete
+              all data we hold about you, follow the steps below.
             </p>
           </section>
 

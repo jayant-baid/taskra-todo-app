@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen bg-[#14161A] text-[#E4E6EB] px-4 py-12">
+    <div className="h-full overflow-y-auto bg-[#14161A] text-[#E4E6EB] px-4 py-12">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-10">
@@ -24,14 +24,16 @@ export default function TermsOfService() {
           <h1 className="text-2xl font-bold text-[#E4E6EB] mb-2">
             Terms of Service
           </h1>
-          <p className="text-xs text-[#8B92A3]">Last updated: September 8, 2026</p>
+          <p className="text-xs text-[#8B92A3]">
+            Last updated: September 8, 2026
+          </p>
         </div>
 
         <div className="flex flex-col gap-8 text-sm leading-relaxed text-[#C8CDD8]">
           <section>
             <p>
-              By using Taskra (&ldquo;the app&rdquo;), you agree to these Terms of
-              Service. Please read them carefully.
+              By using Taskra (&ldquo;the app&rdquo;), you agree to these Terms
+              of Service. Please read them carefully.
             </p>
           </section>
 
@@ -40,9 +42,9 @@ export default function TermsOfService() {
               1. Use of the App
             </h2>
             <p>
-              Taskra is a personal productivity tool for managing tasks
-              and recurring routines. You agree to use it only for lawful
-              purposes and in a manner consistent with these terms.
+              Taskra is a personal productivity tool for managing tasks and
+              recurring routines. You agree to use it only for lawful purposes
+              and in a manner consistent with these terms.
             </p>
           </section>
 
@@ -52,8 +54,8 @@ export default function TermsOfService() {
             </h2>
             <p>
               You are responsible for maintaining the confidentiality of your
-              credentials. You are responsible for all activity that occurs under
-              your account. Notify us immediately of any unauthorized use.
+              credentials. You are responsible for all activity that occurs
+              under your account. Notify us immediately of any unauthorized use.
             </p>
           </section>
 
@@ -64,10 +66,7 @@ export default function TermsOfService() {
             <p>
               You own the task data you create. We store it to provide the
               service. See our{" "}
-              <Link
-                href="/privacy"
-                className="text-[#5B7FFF] hover:underline"
-              >
+              <Link href="/privacy" className="text-[#5B7FFF] hover:underline">
                 Privacy Policy
               </Link>{" "}
               for details on how we handle your data.
@@ -79,9 +78,9 @@ export default function TermsOfService() {
               4. Disclaimers
             </h2>
             <p>
-              The app is provided &ldquo;as is&rdquo; without warranties of any kind. We do
-              not guarantee uninterrupted or error-free service. Use the app at
-              your own risk.
+              The app is provided &ldquo;as is&rdquo; without warranties of any
+              kind. We do not guarantee uninterrupted or error-free service. Use
+              the app at your own risk.
             </p>
           </section>
 
@@ -128,10 +127,7 @@ export default function TermsOfService() {
         {/* Footer */}
         <div className="mt-12 pt-6 border-t border-[#2A2E37] flex items-center justify-between text-xs text-[#5C6272]">
           <span>Taskra</span>
-          <Link
-            href="/"
-            className="text-[#5B7FFF] hover:underline"
-          >
+          <Link href="/" className="text-[#5B7FFF] hover:underline">
             ← Back to App
           </Link>
         </div>
