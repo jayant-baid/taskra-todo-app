@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { db, clearAllLocalData } from '../db/dexie';
 import { TaskDefinition, TaskOccurrence } from '../engine/types';
 import { getLocalDateString, addDays, getWeekDays } from '../engine/dateUtils';
-import { computeOccurrencesForDate, computeDaySummary, computeAnalytics } from '../engine/taskEngine';
+import { computeOccurrencesForDate, computeDaySummary, computeAnalytics, computeMonthlyData } from '../engine/taskEngine';
 import { broadcastMutation, subscribeToMutations } from '../sync/broadcast';
 import { queueSyncItem, initBackgroundSync, flushSyncQueue, pullServerState } from '../sync/syncManager';
 
@@ -13,6 +13,10 @@ export function useTasks() {
   const [taskOccurrences, setTaskOccurrences] = useState<TaskOccurrence[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeWeekCenterDate, setActiveWeekCenterDate] = useState<string>(getLocalDateString());
+  const [activeMonthStr, setActiveMonthStr] = useState<string>(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  });
 
   const todayStr = useMemo(() => getLocalDateString(), []);
   const tomorrowStr = useMemo(() => addDays(todayStr, 1), [todayStr]);

@@ -225,8 +225,9 @@ export function findOrCreateOAuthUser(profile: OAuthProfile): {
         .toLowerCase()
         .replace(/[^a-z0-9_]/g, "")
         .substring(0, 15) || "user";
-    const uniqueSuffix = Math.random().toString(36).substring(2, 6);
-    const username = `${cleanBaseName}_${uniqueSuffix}`;
+    // const uniqueSuffix = Math.random().toString(36).substring(2, 6);
+    // const username = `${cleanBaseName}_${uniqueSuffix}`;
+    const username = `${cleanBaseName}`;
     const createdAt = new Date().toISOString();
 
     const insertStmt = db.prepare(`

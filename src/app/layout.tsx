@@ -2,13 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Taskra – Recurring Todo Task",
+  title: "Taskra – Smart Task & Productivity Manager",
   description:
-    "Cross-device recurring task manager with roll-forward daily tasks, weekly analytics, and real-time sync.",
-  icons: {
-    icon: "/favicon.png",
-    apple: "/favicon.png",
-  },
+    "Stay organized with Taskra — manage recurring tasks, carry-forward to-dos, weekly progress, and task history in one simple productivity app.",
 };
 
 export default function RootLayout({

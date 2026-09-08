@@ -1,11 +1,15 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
-import { DaySummary } from '@/lib/engine/types';
-import { DayCard } from './DayCard';
-import { PastDayModal } from './PastDayModal';
-import { Button } from '@/components/ui/Button';
+import React, { useState } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Calendar as CalendarIcon,
+} from "lucide-react";
+import { DaySummary } from "@/lib/engine/types";
+import { DayCard } from "./DayCard";
+import { PastDayModal } from "./PastDayModal";
+import { Button } from "@/components/ui/Button";
 
 export interface WeeklyViewProps {
   weekSummaries: DaySummary[];
@@ -22,7 +26,9 @@ export function WeeklyView({
   onCurrentWeek,
   onSelectToday,
 }: WeeklyViewProps) {
-  const [selectedPastDay, setSelectedPastDay] = useState<DaySummary | null>(null);
+  const [selectedPastDay, setSelectedPastDay] = useState<DaySummary | null>(
+    null,
+  );
 
   const firstDay = weekSummaries[0];
   const lastDay = weekSummaries[weekSummaries.length - 1];
@@ -48,14 +54,20 @@ export function WeeklyView({
             Weekly Progress
           </h3>
           {firstDay && lastDay && (
-            <span className="text-xs text-[#8B92A3]">
-              {firstDay.monthName} {firstDay.dayNumber} – {lastDay.monthName} {lastDay.dayNumber}
+            <span className="hidden sm:inline text-xs text-[#8B92A3]">
+              {firstDay.monthName} {firstDay.dayNumber} – {lastDay.monthName}{" "}
+              {lastDay.dayNumber}
             </span>
           )}
         </div>
 
         <div className="flex items-center gap-1">
-          <Button variant="secondary" size="sm" onClick={onCurrentWeek} className="text-xs">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onCurrentWeek}
+            className="text-xs"
+          >
             Current Week
           </Button>
           <Button
@@ -80,7 +92,7 @@ export function WeeklyView({
       </div>
 
       {/* 7-Day Grid */}
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-7 gap-2">
         {weekSummaries.map((daySummary) => (
           <DayCard
             key={daySummary.date}

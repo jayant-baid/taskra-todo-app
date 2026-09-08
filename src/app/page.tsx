@@ -19,6 +19,7 @@ import { AddTaskModal } from "@/components/task-rail/AddTaskModal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { Button } from "@/components/ui/Button";
+import { ResizableDivider } from "@/components/ui/ResizableDivider";
 
 export default function Home() {
   const {
@@ -56,6 +57,18 @@ export default function Home() {
   const [isRemoving, setIsRemoving] = useState(false);
   const [mobileTab, setMobileTab] = useState<"tasks" | "analytics">("tasks");
 
+  const [leftWidth, setLeftWidth] = useState(460);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleResize = (clientX: number) => {
+    const minWidth = 400;
+    const maxWidth = 700;
+
+    const newWidth = Math.min(maxWidth, Math.max(minWidth, clientX));
+
+    setLeftWidth(newWidth);
+  };
+
   // Open Auth Modal if OAuth returned an error
   useEffect(() => {
     if (oauthError) {
@@ -77,7 +90,7 @@ export default function Home() {
         return;
       }
 
-      if (e.key === "n" || e.key === "N") {
+      if ((e.ctrlKey || e.metaKey) && (e.key === "n" || e.key === "N")) {
         e.preventDefault();
         setIsAddModalOpen(true);
       }
@@ -125,7 +138,7 @@ export default function Home() {
           </div>
           <span className="text-[#383E4C] hidden sm:inline">|</span>
           <span className="text-xs text-[#8B92A3] hidden lg:inline-block">
-            Recurring Task Engine
+            Plan. Focus. Complete.
           </span>
         </div>
 
@@ -153,7 +166,7 @@ export default function Home() {
             <Plus size={14} />
             <span className="hidden lg:inline">New Task</span>
             <span className="hidden md:inline text-[10px] bg-white/20 px-1 py-0.2 rounded font-mono">
-              N
+              Ctrl+N
             </span>
           </Button>
 
@@ -234,9 +247,8 @@ export default function Home() {
       <main className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
         {/* Left Rail: Task List (Today & Tomorrow) */}
         <section
-          className={`w-full md:w-[460px] lg:w-[500px] shrink-0 border-b md:border-b-0 md:border-r border-[#2A2E37] bg-[#14161A] p-4 flex-col min-h-0 ${
-            mobileTab === "tasks" ? "flex flex-1" : "hidden md:flex"
-          }`}
+          style={{ width: `${leftWidth}px` }}
+          className={`shrink-0 bg-[#14161A] p-4`}
         >
           {isTasksLoading ? (
             <div className="flex items-center justify-center h-full text-xs text-[#8B92A3]">
@@ -256,12 +268,14 @@ export default function Home() {
           )}
         </section>
 
+        <ResizableDivider
+          onResize={handleResize}
+          isDragging={isDragging}
+          setIsDragging={setIsDragging}
+        />
+
         {/* Right Dock: Calendar & Performance Analytics */}
-        <section
-          className={`flex-1 bg-[#14161A] p-4 sm:p-5 flex-col min-h-0 overflow-y-auto ${
-            mobileTab === "analytics" ? "flex flex-1" : "hidden md:flex"
-          }`}
-        >
+        <section className={`flex-1 bg-[#14161A] p-4 overflow-y-auto `}>
           <CalendarDock
             weekSummaries={weekSummaries}
             analytics={analytics}

@@ -276,3 +276,39 @@ export function computeAnalytics(
     carryOverCount,
   };
 }
+
+/**
+ * Returns an array of DaySummary for every day in the given month (YYYY-MM).
+ * Fills leading/trailing blanks so the grid always starts on Monday.
+ */
+export function computeMonthlyData(
+  yearMonth: string, // 'YYYY-MM'
+  taskDefinitions: TaskDefinition[],
+  persistedOccurrences: TaskOccurrence[],
+  todayStr: string = getLocalDateString()
+): (DaySummary | null)[] {
+  const [year, month] = yearMonth.split('-').map(Number);
+  const firstDay = new Date(year, month - 1, 1);
+  const lastDay = new Date(year, month, 0);
+  const totalDays = lastDay.getDate();
+
+  // Monday-based week offset (0=Mon…6=Sun)
+  const startDow = (firstDay.getDay() + 6) % 7;
+
+  const cells: (DaySummary | null)[] = [];
+  // Leading blanks
+  for (let i = 0; i < startDow; i++) cells.push(null);
+
+  for (let d = 1; d <= totalDays; d++) {
+    const mm = String(month).padStart(2, '0');
+    const dd = String(d).padStart(2, '0');
+    const dateStr = `${year}-${mm}-${dd}`;
+    cells.push(computeDaySummary(dateStr, taskDefinitions, persistedOccurrences, todayStr));
+  }
+
+  // Trailing blanks to complete the last row
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  return cells;
+}
+

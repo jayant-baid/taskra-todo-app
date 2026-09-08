@@ -1,11 +1,10 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Plus, AlertCircle } from 'lucide-react';
-import { ComputedOccurrence } from '@/lib/engine/types';
-import { TaskSection } from './TaskSection';
-import { Button } from '@/components/ui/Button';
-import { formatDisplayDate } from '@/lib/engine/dateUtils';
+import { Plus, AlertCircle } from "lucide-react";
+import { ComputedOccurrence } from "@/lib/engine/types";
+import { TaskSection } from "./TaskSection";
+import { Button } from "@/components/ui/Button";
+import { formatDisplayDate } from "@/lib/engine/dateUtils";
 
 export interface TaskRailProps {
   todayStr: string;
@@ -33,7 +32,9 @@ export function TaskRail({
       {/* Rail Top Action Bar */}
       <div className="flex items-center justify-between pb-4 pt-1">
         <div className="flex flex-col">
-          <h2 className="text-base font-semibold text-[#E4E6EB] tracking-tight">Daily Tasks</h2>
+          <h2 className="text-base font-semibold text-[#E4E6EB] tracking-tight">
+            Daily Tasks
+          </h2>
           <span className="text-xs text-[#8B92A3]">
             {formatDisplayDate(todayStr)} &middot; Local device timezone
           </span>
@@ -43,7 +44,7 @@ export function TaskRail({
           size="sm"
           onClick={onOpenAddModal}
           className="gap-1.5 shadow-sm"
-          title="Create task (Shortcut: N)"
+          title="Create task (Shortcut: Ctrl+N)"
         >
           <Plus size={14} />
           <span>Add New Task</span>
@@ -55,7 +56,10 @@ export function TaskRail({
         <div className="mb-3.5 flex items-center gap-2 p-2.5 bg-[rgba(232,179,57,0.08)] border border-[rgba(232,179,57,0.25)] rounded-[3px] text-xs text-[#E8B339]">
           <AlertCircle size={14} className="shrink-0" />
           <span>
-            <strong>{carryOverCount} task{carryOverCount > 1 ? 's' : ''}</strong> rolled forward from previous days awaiting completion.
+            <strong>
+              {carryOverCount} task{carryOverCount > 1 ? "s" : ""}
+            </strong>{" "}
+            rolled forward from previous days awaiting completion.
           </span>
         </div>
       )}
@@ -68,7 +72,7 @@ export function TaskRail({
           occurrences={todayOccurrences}
           onToggle={onToggle}
           onDelete={onDelete}
-          emptyText="No tasks scheduled for today. Create one with [+ Add New Task]."
+          emptyText="No tasks scheduled for today. Create one with [+ Add New Task] or press Ctrl + N key."
         />
 
         {/* Tomorrow Section */}
