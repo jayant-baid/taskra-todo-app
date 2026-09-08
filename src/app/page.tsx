@@ -247,8 +247,9 @@ export default function Home() {
       <main className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
         {/* Left Rail: Task List (Today & Tomorrow) */}
         <section
-          style={{ width: `${leftWidth}px` }}
-          className={`shrink-0 bg-[#14161A] p-4`}
+          className={`w-full md:w-[460px] lg:w-[500px] shrink-0 border-b md:border-b-0 md:border-r border-[#2A2E37] bg-[#14161A] p-4 flex-col min-h-0 ${
+            mobileTab === "tasks" ? "flex flex-1" : "hidden md:flex"
+          }`}
         >
           {isTasksLoading ? (
             <div className="flex items-center justify-center h-full text-xs text-[#8B92A3]">
@@ -268,14 +269,18 @@ export default function Home() {
           )}
         </section>
 
-        <ResizableDivider
+        {/* <ResizableDivider
           onResize={handleResize}
           isDragging={isDragging}
           setIsDragging={setIsDragging}
-        />
+        /> */}
 
         {/* Right Dock: Calendar & Performance Analytics */}
-        <section className={`flex-1 bg-[#14161A] p-4 overflow-y-auto `}>
+        <section
+          className={`flex-1 bg-[#14161A] p-4 sm:p-5 flex-col min-h-0 overflow-y-auto ${
+            mobileTab === "analytics" ? "flex flex-1" : "hidden md:flex"
+          }`}
+        >
           <CalendarDock
             weekSummaries={weekSummaries}
             analytics={analytics}
