@@ -1,12 +1,13 @@
-import type { Metadata } from 'next';
-import './globals.css';
+import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: 'Taskra – Recurring Task Engine',
-  description: 'Cross-device recurring task manager with roll-forward daily tasks, weekly analytics, and real-time sync.',
+  title: "Taskra – Recurring Todo Task",
+  description:
+    "Cross-device recurring task manager with roll-forward daily tasks, weekly analytics, and real-time sync.",
   icons: {
-    icon: '/favicon.png',
-    apple: '/favicon.png',
+    icon: "/favicon.png",
+    apple: "/favicon.png",
   },
 };
 
