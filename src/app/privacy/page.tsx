@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy – Recurring // OPS",
-  description: "Privacy Policy for the Recurring // OPS task management application.",
+  title: "Privacy Policy – Taskra",
+  description: "Privacy Policy for the Taskra task management application.",
 };
 
 export default function PrivacyPolicy() {
@@ -18,7 +18,7 @@ export default function PrivacyPolicy() {
               href="/"
               className="text-sm font-semibold tracking-tight text-[#E4E6EB] hover:text-[#5B7FFF] transition-colors"
             >
-              RECURRING // OPS
+              Taskra
             </Link>
           </div>
           <h1 className="text-2xl font-bold text-[#E4E6EB] mb-2">
@@ -31,7 +31,7 @@ export default function PrivacyPolicy() {
           {/* Intro */}
           <section>
             <p>
-              Recurring // OPS (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;the app&rdquo;) is a personal task
+              Taskra (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;the app&rdquo;) is a personal task
               management application. This Privacy Policy explains what information
               we collect, how we use it, and your rights regarding your data.
             </p>
@@ -115,7 +115,7 @@ export default function PrivacyPolicy() {
             </ul>
             <p className="mt-3">
               We store your provider ID, email, name, and avatar URL to link
-              your social account to your Recurring // OPS account. We do not
+              your social account to your Taskra account. We do not
               post on your behalf or access your contacts or friends lists.
             </p>
           </section>
@@ -171,7 +171,7 @@ export default function PrivacyPolicy() {
               7. Children&apos;s Privacy
             </h2>
             <p>
-              Recurring // OPS is not directed at children under the age of 13.
+              Taskra is not directed at children under the age of 13.
               We do not knowingly collect personal information from children
               under 13. If you believe we have inadvertently collected such
               information, please contact us for immediate deletion.
@@ -214,7 +214,7 @@ export default function PrivacyPolicy() {
 
         {/* Footer */}
         <div className="mt-12 pt-6 border-t border-[#2A2E37] flex items-center justify-between text-xs text-[#5C6272]">
-          <span>Recurring // OPS</span>
+          <span>Taskra</span>
           <Link
             href="/"
             className="text-[#5B7FFF] hover:underline"

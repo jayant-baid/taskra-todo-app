@@ -91,7 +91,7 @@ export function AuthModal({
       isOpen={isOpen}
       onClose={onClose}
       title={
-        mode === "login" ? "Sign In to Recurring // OPS" : "Create an Account"
+        mode === "login" ? "Sign In to Taskra" : "Create an Account"
       }
       subtitle="Sync your tasks, recurring routines, and history across mobile and desktop"
       maxWidth="max-w-md"

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Terms of Service – Recurring // OPS",
-  description: "Terms of Service for the Recurring // OPS task management application.",
+  title: "Terms of Service – Taskra",
+  description: "Terms of Service for the Taskra task management application.",
 };
 
 export default function TermsOfService() {
@@ -18,7 +18,7 @@ export default function TermsOfService() {
               href="/"
               className="text-sm font-semibold tracking-tight text-[#E4E6EB] hover:text-[#5B7FFF] transition-colors"
             >
-              RECURRING // OPS
+              Taskra
             </Link>
           </div>
           <h1 className="text-2xl font-bold text-[#E4E6EB] mb-2">
@@ -30,7 +30,7 @@ export default function TermsOfService() {
         <div className="flex flex-col gap-8 text-sm leading-relaxed text-[#C8CDD8]">
           <section>
             <p>
-              By using Recurring // OPS (&ldquo;the app&rdquo;), you agree to these Terms of
+              By using Taskra (&ldquo;the app&rdquo;), you agree to these Terms of
               Service. Please read them carefully.
             </p>
           </section>
@@ -40,7 +40,7 @@ export default function TermsOfService() {
               1. Use of the App
             </h2>
             <p>
-              Recurring // OPS is a personal productivity tool for managing tasks
+              Taskra is a personal productivity tool for managing tasks
               and recurring routines. You agree to use it only for lawful
               purposes and in a manner consistent with these terms.
             </p>
@@ -127,7 +127,7 @@ export default function TermsOfService() {
 
         {/* Footer */}
         <div className="mt-12 pt-6 border-t border-[#2A2E37] flex items-center justify-between text-xs text-[#5C6272]">
-          <span>Recurring // OPS</span>
+          <span>Taskra</span>
           <Link
             href="/"
             className="text-[#5B7FFF] hover:underline"

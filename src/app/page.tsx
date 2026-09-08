@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   Plus,
   Trash2,
@@ -111,14 +112,20 @@ export default function Home() {
       <header className="h-12 border-b border-[#2A2E37] bg-[#1C1F26] px-3 sm:px-5 flex items-center justify-between shrink-0 select-none">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 bg-[#5B7FFF] rounded-[1px]" />
+            <Image
+              src="/logo_1024.png"
+              alt="Taskra"
+              width={26}
+              height={26}
+              className="rounded-lg"
+            />
             <h1 className="text-sm font-semibold tracking-tight text-[#E4E6EB]">
-              RECURRING // OPS
+              Taskra
             </h1>
           </div>
           <span className="text-[#383E4C] hidden sm:inline">|</span>
           <span className="text-xs text-[#8B92A3] hidden lg:inline-block">
-            Cross-Device Task Engine
+            Recurring Task Engine
           </span>
         </div>
 

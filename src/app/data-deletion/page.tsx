@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Data Deletion – Recurring // OPS",
+  title: "Data Deletion – Taskra",
   description:
-    "Instructions to delete your Recurring // OPS account and all associated data.",
+    "Instructions to delete your Taskra account and all associated data.",
 };
 
 export default function DataDeletion() {
@@ -19,7 +19,7 @@ export default function DataDeletion() {
               href="/"
               className="text-sm font-semibold tracking-tight text-[#E4E6EB] hover:text-[#5B7FFF] transition-colors"
             >
-              RECURRING // OPS
+              Taskra
             </Link>
           </div>
           <h1 className="text-2xl font-bold text-[#E4E6EB] mb-2">
@@ -33,7 +33,7 @@ export default function DataDeletion() {
         <div className="flex flex-col gap-8 text-sm leading-relaxed text-[#C8CDD8]">
           <section>
             <p>
-              If you signed in to Recurring // OPS using Facebook and would like
+              If you signed in to Taskra using Facebook and would like
               to delete all data we hold about you, follow the steps below.
             </p>
           </section>
@@ -47,7 +47,7 @@ export default function DataDeletion() {
               <li>
                 Open{" "}
                 <Link href="/" className="text-[#5B7FFF] hover:underline">
-                  Recurring // OPS
+                  Taskra
                 </Link>{" "}
                 and sign in.
               </li>
@@ -112,7 +112,7 @@ export default function DataDeletion() {
 
         {/* Footer */}
         <div className="mt-12 pt-6 border-t border-[#2A2E37] flex items-center justify-between text-xs text-[#5C6272]">
-          <span>Recurring // OPS</span>
+          <span>Taskra</span>
           <div className="flex gap-4">
             <Link href="/privacy" className="text-[#5B7FFF] hover:underline">
               Privacy Policy
