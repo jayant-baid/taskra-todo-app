@@ -132,7 +132,7 @@ export function AuthModal({
           </button>
 
           {/* Facebook Button */}
-          <button
+          {/* <button
             type="button"
             onClick={() => handleSocialAuth("facebook")}
             disabled={Boolean(isSocialLoading) || isSubmitting}
@@ -152,7 +152,7 @@ export function AuthModal({
                 <span>Continue with Facebook</span>
               </>
             )}
-          </button>
+          </button> */}
         </div>
 
         {/* Divider */}
