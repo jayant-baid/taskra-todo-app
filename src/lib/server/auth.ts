@@ -6,6 +6,7 @@ export interface UserRecord {
   username: string;
   role: "user" | "admin";
   created_at: string;
+  avatar_url: string | null;
 }
 
 export function hashPassword(password: string, salt: string): string {
@@ -42,7 +43,7 @@ export async function getUserFromToken(
 ): Promise<UserRecord | null> {
   if (!token) return null;
   const rows = await query<UserRecord>(
-    `SELECT u.id, u.username, u.role, u.created_at
+    `SELECT u.id, u.username, u.role, u.created_at, u.avatar_url
      FROM sessions s JOIN users u ON s.user_id = u.id
      WHERE s.token = ? AND s.expires_at > ?`,
     [token, new Date().toISOString()],

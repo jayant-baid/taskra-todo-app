@@ -230,12 +230,24 @@ export default function Home() {
                   >
                     <CloudCheck size={13} />
                   </span>
-                  <span
-                    className="text-[#E4E6EB] font-medium max-w-[100px] truncate"
-                    title={`Signed in as ${user.username}`}
-                  >
-                    {user.username}
-                  </span>
+                  {user.avatarUrl ? (
+                    <Image
+                      src={user.avatarUrl}
+                      alt={user.username}
+                      width={24}
+                      height={24}
+                      unoptimized
+                      className="h-6 w-6 rounded-full object-cover"
+                      title={`Signed in as ${user.username}`}
+                    />
+                  ) : (
+                    <span
+                      className="text-[#E4E6EB] font-medium max-w-[100px] truncate"
+                      title={`Signed in as ${user.username}`}
+                    >
+                      {user.username}
+                    </span>
+                  )}
                   {user.role === "admin" && (
                     <a
                       href="/admin"

@@ -15,6 +15,7 @@ export async function GET(request: Request) {
         username: user.username,
         role: user.role,
         createdAt: user.created_at,
+        avatarUrl: user.avatar_url,
       },
     });
   } catch (err: unknown) {

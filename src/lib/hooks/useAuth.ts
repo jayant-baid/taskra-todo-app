@@ -7,6 +7,7 @@ export interface AuthUser {
   username: string;
   role: "user" | "admin";
   createdAt?: string;
+  avatarUrl?: string | null;
 }
 
 export function getClientToken(): string | null {

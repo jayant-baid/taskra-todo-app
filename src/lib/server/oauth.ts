@@ -177,7 +177,7 @@ export async function findOrCreateOAuthUser(profile: OAuthProfile): Promise<{
   let user: UserRecord | undefined;
   const providerUsers = await query<UserRecord>(
     `
-    SELECT id, username, role, created_at
+    SELECT id, username, role, created_at, avatar_url
     FROM users
     WHERE provider = ? AND provider_id = ?
   `,
@@ -192,7 +192,7 @@ export async function findOrCreateOAuthUser(profile: OAuthProfile): Promise<{
     // 2. Try to find user by email to link accounts
     const emailUsers = await query<UserRecord>(
       `
-      SELECT id, username, role, created_at
+      SELECT id, username, role, created_at, avatar_url
       FROM users
       WHERE LOWER(email) = ?
     `,
@@ -266,6 +266,7 @@ export async function findOrCreateOAuthUser(profile: OAuthProfile): Promise<{
       username,
       role: "user",
       created_at: createdAt,
+      avatar_url: profile.avatarUrl || null,
     };
   }
 

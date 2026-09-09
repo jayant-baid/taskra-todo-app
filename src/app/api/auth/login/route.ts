@@ -22,9 +22,10 @@ export async function POST(request: Request) {
       password_hash: string;
       salt: string;
       created_at: string;
+      avatar_url: string | null;
     }>(
       `
-      SELECT id, username, role, password_hash, salt, created_at
+      SELECT id, username, role, password_hash, salt, created_at, avatar_url
       FROM users
       WHERE username = ?
     `,
@@ -57,6 +58,7 @@ export async function POST(request: Request) {
         username: user.username,
         role: user.role,
         createdAt: user.created_at,
+        avatarUrl: user.avatar_url,
       },
       token,
     });
