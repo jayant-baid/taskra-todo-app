@@ -233,11 +233,12 @@ export function findOrCreateOAuthUser(profile: OAuthProfile): {
   // 3. Create a new user if not found
   if (!user) {
     const userId = `usr_${crypto.randomUUID()}`;
+    const emailUsername = profile.email?.split("@", 1)[0];
     const cleanBaseName =
-      (profile.name || "user")
+      (emailUsername || profile.name || "user")
         .toLowerCase()
         .replace(/[^a-z0-9_]/g, "")
-        .substring(0, 15) || "user";
+        .substring(0, 30) || "user";
     let username = cleanBaseName;
     let usernameSuffix = 2;
     const usernameExistsStmt = db.prepare(
