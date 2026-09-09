@@ -168,40 +168,6 @@ The analytics panel functions as a retrospective view:
 - date-fns and react-day-picker
 - Tailwind CSS
 
-## Development
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Start the app in development mode:
-
-```bash
-npm run dev
-```
-
-Open http://localhost:3000 in the browser.
-
-Run the linter:
-
-```bash
-npm run lint
-```
-
-Run a production build:
-
-```bash
-npm run build
-```
-
-Start the production build locally:
-
-```bash
-npm run start
-```
-
 ## Notes for contributors
 
 This project is intentionally opinionated around productive workflows:
@@ -212,24 +178,6 @@ This project is intentionally opinionated around productive workflows:
 - desktop-oriented layout with responsive support
 
 If you are changing task behavior, especially around recurrence, streak logic, or historical completion, check the engine code before adjusting the UI. The core rules are defined in the task engine and recurrence utilities, and the dashboard simply reflects those calculations.
-
-## Production considerations
-
-The app includes server-side auth/sync flows and browser-based OAuth, so deployment should provide the environment and storage expected by the app. The project is already structured for a Next.js deployment target, but the production environment must support:
-
-- database access for user/session storage on persistent storage; the database must not live in a serverless `/tmp` directory
-- `DATABASE_PATH` set to the mounted persistent SQLite file when deploying to a host with a persistent volume
-- OAuth callback configuration for Google and Facebook
-- static asset hosting for the app shell and any branding assets
-- sync and auth endpoints exposed through the Next.js runtime
-
-Create the `dragonmaster` admin account once with a direct SQL seed after the schema is initialized. On Vercel, `/tmp` is not persistent or shared between function instances, so use the PostgreSQL database configured by `DATABASE_URL`.
-
-To seed it without application bootstrap logic, register `dragonmaster` once through the app, then run this directly in the PostgreSQL Query Tool:
-
-```sql
-UPDATE users SET role = 'admin' WHERE username = 'dragonmaster';
-```
 
 ## Summary
 
