@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from "react";
 export interface AuthUser {
   id: string;
   username: string;
+  role: "user" | "admin";
   createdAt?: string;
 }
 

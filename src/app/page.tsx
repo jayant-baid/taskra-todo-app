@@ -12,6 +12,7 @@ import {
   BarChart2,
   SunMedium,
   MoonStar,
+  ShieldCheck,
 } from "lucide-react";
 import { useTasks } from "@/lib/hooks/useTasks";
 import { useAuthInternal } from "@/lib/hooks/useAuth";
@@ -235,6 +236,15 @@ export default function Home() {
                   >
                     {user.username}
                   </span>
+                  {user.role === "admin" && (
+                    <a
+                      href="/admin"
+                      title="Open admin console"
+                      className="text-[var(--accent-primary)] hover:text-white"
+                    >
+                      <ShieldCheck size={13} />
+                    </a>
+                  )}
                   <button
                     type="button"
                     onClick={() => setIsLogoutModalOpen(true)}

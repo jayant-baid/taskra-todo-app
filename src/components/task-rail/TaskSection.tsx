@@ -13,6 +13,7 @@ export interface TaskSectionProps {
   onDelete: (taskDefId: string) => void;
   onEdit: (occurrence: ComputedOccurrence) => void;
   emptyText?: string;
+  isReadOnly?: boolean;
 }
 
 export function TaskSection({
@@ -23,6 +24,7 @@ export function TaskSection({
   onDelete,
   onEdit,
   emptyText = "No tasks scheduled",
+  isReadOnly = false,
 }: TaskSectionProps) {
   const completedCount = occurrences.filter(
     (o) => o.status === "completed",
@@ -70,6 +72,7 @@ export function TaskSection({
               onToggle={onToggle}
               onDelete={onDelete}
               onEdit={onEdit}
+              isReadOnly={isReadOnly}
             />
           ))
         )}

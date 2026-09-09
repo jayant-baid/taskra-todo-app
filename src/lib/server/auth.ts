@@ -4,6 +4,7 @@ import { getDatabase } from "./db";
 export interface UserRecord {
   id: string;
   username: string;
+  role: "user" | "admin";
   created_at: string;
 }
 
@@ -50,20 +51,21 @@ export function getUserFromToken(token: string): UserRecord | null {
   const nowIso = new Date().toISOString();
 
   const stmt = db.prepare(`
-    SELECT u.id, u.username, u.created_at
+    SELECT u.id, u.username, u.role, u.created_at
     FROM sessions s
     JOIN users u ON s.user_id = u.id
     WHERE s.token = ? AND s.expires_at > ?
   `);
 
   const row = stmt.get(token, nowIso) as
-    | { id: string; username: string; created_at: string }
+    | { id: string; username: string; role: "user" | "admin"; created_at: string }
     | undefined;
   if (!row) return null;
 
   return {
     id: row.id,
     username: row.username,
+    role: row.role,
     created_at: row.created_at,
   };
 }

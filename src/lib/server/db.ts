@@ -36,6 +36,7 @@ export function getDatabase(): DatabaseSync {
       provider TEXT DEFAULT 'local',
       provider_id TEXT,
       avatar_url TEXT,
+      role TEXT NOT NULL DEFAULT 'user',
       created_at TEXT NOT NULL
     );
 
@@ -100,6 +101,11 @@ export function getDatabase(): DatabaseSync {
     }
     if (!columnNames.has("avatar_url")) {
       dbInstance.exec("ALTER TABLE users ADD COLUMN avatar_url TEXT;");
+    }
+    if (!columnNames.has("role")) {
+      dbInstance.exec(
+        "ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user';",
+      );
     }
 
     dbInstance.exec(

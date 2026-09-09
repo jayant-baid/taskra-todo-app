@@ -178,14 +178,14 @@ export function findOrCreateOAuthUser(profile: OAuthProfile): {
   // 1. Try to find user by provider and providerId
   let user: UserRecord | undefined;
   const findByProviderStmt = db.prepare(`
-    SELECT id, username, created_at
+    SELECT id, username, role, created_at
     FROM users
     WHERE provider = ? AND provider_id = ?
   `);
   const existingProviderUser = findByProviderStmt.get(
     profile.provider,
     profile.providerId,
-  ) as { id: string; username: string; created_at: string } | undefined;
+  ) as { id: string; username: string; role: "user" | "admin"; created_at: string } | undefined;
 
   if (existingProviderUser) {
     user = existingProviderUser;
@@ -193,12 +193,12 @@ export function findOrCreateOAuthUser(profile: OAuthProfile): {
     const normalizedEmail = profile.email.trim().toLowerCase();
     // 2. Try to find user by email to link accounts
     const findByEmailStmt = db.prepare(`
-      SELECT id, username, created_at
+      SELECT id, username, role, created_at
       FROM users
       WHERE LOWER(email) = ?
     `);
     const existingEmailUser = findByEmailStmt.get(normalizedEmail) as
-      | { id: string; username: string; created_at: string }
+      | { id: string; username: string; role: "user" | "admin"; created_at: string }
       | undefined;
 
     if (existingEmailUser) {
@@ -258,6 +258,7 @@ export function findOrCreateOAuthUser(profile: OAuthProfile): {
     user = {
       id: userId,
       username,
+      role: "user",
       created_at: createdAt,
     };
   }

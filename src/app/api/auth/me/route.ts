@@ -13,6 +13,7 @@ export async function GET(request: Request) {
       user: {
         id: user.id,
         username: user.username,
+        role: user.role,
         createdAt: user.created_at,
       },
     });

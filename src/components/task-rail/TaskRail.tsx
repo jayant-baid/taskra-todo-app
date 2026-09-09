@@ -16,6 +16,7 @@ export interface TaskRailProps {
   onEdit: (occurrence: ComputedOccurrence) => void;
   onOpenAddModal: () => void;
   carryOverCount: number;
+  isReadOnly?: boolean;
 }
 
 export function TaskRail({
@@ -28,6 +29,7 @@ export function TaskRail({
   onEdit,
   onOpenAddModal,
   carryOverCount,
+  isReadOnly = false,
 }: TaskRailProps) {
   return (
     <div className="flex flex-col h-full overflow-y-auto pr-1">
@@ -41,16 +43,18 @@ export function TaskRail({
             {formatDisplayDate(todayStr)}
           </span>
         </div>
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={onOpenAddModal}
-          className="gap-1.5 shadow-sm truncate"
-          title="Create task (Shortcut: Ctrl+N)"
-        >
-          <Plus size={14} />
-          <span className="hidden sm:inline">Add New Task</span>
-        </Button>
+        {!isReadOnly && (
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={onOpenAddModal}
+            className="gap-1.5 shadow-sm truncate"
+            title="Create task (Shortcut: Ctrl+N)"
+          >
+            <Plus size={14} />
+            <span className="hidden sm:inline">Add New Task</span>
+          </Button>
+        )}
       </div>
 
       {/* Carry-over notice if any */}
@@ -75,6 +79,7 @@ export function TaskRail({
           onToggle={onToggle}
           onDelete={onDelete}
           onEdit={onEdit}
+          isReadOnly={isReadOnly}
           emptyText="No tasks scheduled for today. Create one with [+ Add New Task] or press Ctrl + N key."
         />
 
@@ -86,6 +91,7 @@ export function TaskRail({
           onToggle={onToggle}
           onDelete={onDelete}
           onEdit={onEdit}
+          isReadOnly={isReadOnly}
           emptyText="No tasks scheduled for tomorrow."
         />
       </div>
