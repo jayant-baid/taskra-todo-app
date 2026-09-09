@@ -1,5 +1,5 @@
-import crypto from 'node:crypto';
-import { getDatabase } from './db';
+import crypto from "node:crypto";
+import { getDatabase } from "./db";
 
 export interface UserRecord {
   id: string;
@@ -8,14 +8,19 @@ export interface UserRecord {
 }
 
 export function hashPassword(password: string, salt: string): string {
-  return crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
+  return crypto
+    .pbkdf2Sync(password, salt, 100000, 64, "sha512")
+    .toString("hex");
 }
 
 export function generateSalt(): string {
-  return crypto.randomBytes(16).toString('hex');
+  return crypto.randomBytes(16).toString("hex");
 }
 
-export function createSession(userId: string): { token: string; expiresAt: string } {
+export function createSession(userId: string): {
+  token: string;
+  expiresAt: string;
+} {
   const db = getDatabase();
   const token = crypto.randomUUID();
   const now = new Date();
@@ -35,7 +40,7 @@ export function createSession(userId: string): { token: string; expiresAt: strin
 
 export function deleteSession(token: string): void {
   const db = getDatabase();
-  const stmt = db.prepare('DELETE FROM sessions WHERE token = ?');
+  const stmt = db.prepare("DELETE FROM sessions WHERE token = ?");
   stmt.run(token);
 }
 
@@ -51,7 +56,9 @@ export function getUserFromToken(token: string): UserRecord | null {
     WHERE s.token = ? AND s.expires_at > ?
   `);
 
-  const row = stmt.get(token, nowIso) as { id: string; username: string; created_at: string } | undefined;
+  const row = stmt.get(token, nowIso) as
+    | { id: string; username: string; created_at: string }
+    | undefined;
   if (!row) return null;
 
   return {
@@ -63,13 +70,16 @@ export function getUserFromToken(token: string): UserRecord | null {
 
 export function extractTokenFromRequest(request: Request): string | null {
   // 1. Check Authorization: Bearer <token>
-  const authHeader = request.headers.get('Authorization') || request.headers.get('authorization');
-  if (authHeader && authHeader.startsWith('Bearer ')) {
+  const authHeader =
+    request.headers.get("Authorization") ||
+    request.headers.get("authorization");
+  if (authHeader && authHeader.startsWith("Bearer ")) {
     return authHeader.substring(7).trim();
   }
 
   // 2. Check Cookie header
-  const cookieHeader = request.headers.get('cookie') || request.headers.get('Cookie');
+  const cookieHeader =
+    request.headers.get("cookie") || request.headers.get("Cookie");
   if (cookieHeader) {
     const match = cookieHeader.match(/(?:^|;\s*)session_token=([^;]+)/);
     if (match && match[1]) {
@@ -81,13 +91,16 @@ export function extractTokenFromRequest(request: Request): string | null {
 }
 
 export function getAuthUser(request: Request): UserRecord | null {
-  const authHeader = request.headers.get('Authorization') || request.headers.get('authorization');
-  if (authHeader && authHeader.startsWith('Bearer ')) {
+  const authHeader =
+    request.headers.get("Authorization") ||
+    request.headers.get("authorization");
+  if (authHeader && authHeader.startsWith("Bearer ")) {
     const bearerUser = getUserFromToken(authHeader.substring(7).trim());
     if (bearerUser) return bearerUser;
   }
 
-  const cookieHeader = request.headers.get('cookie') || request.headers.get('Cookie');
+  const cookieHeader =
+    request.headers.get("cookie") || request.headers.get("Cookie");
   if (cookieHeader) {
     const match = cookieHeader.match(/(?:^|;\s*)session_token=([^;]+)/);
     if (match && match[1]) {
