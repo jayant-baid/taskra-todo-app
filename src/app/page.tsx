@@ -117,7 +117,7 @@ export default function Home() {
         return;
       }
 
-      if ((e.ctrlKey || e.metaKey) && (e.key === "n" || e.key === "N")) {
+      if (e.shiftKey && (e.key === "n" || e.key === "N")) {
         e.preventDefault();
         setIsAddModalOpen(true);
       }
@@ -215,7 +215,7 @@ export default function Home() {
             <Plus size={14} />
             <span className="hidden lg:inline">New Task</span>
             <span className="hidden md:inline text-[10px] bg-white/20 px-1 py-0.2 rounded font-mono">
-              Ctrl+N
+              Shift+N
             </span>
           </Button>
 

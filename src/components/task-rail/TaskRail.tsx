@@ -49,7 +49,7 @@ export function TaskRail({
             size="sm"
             onClick={onOpenAddModal}
             className="gap-1.5 shadow-sm truncate"
-            title="Create task (Shortcut: Ctrl+N)"
+            title="Create task (Shortcut: Shift+N)"
           >
             <Plus size={14} />
             <span className="hidden sm:inline">Add New Task</span>
