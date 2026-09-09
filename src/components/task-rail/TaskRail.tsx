@@ -13,6 +13,7 @@ export interface TaskRailProps {
   tomorrowOccurrences: ComputedOccurrence[];
   onToggle: (taskDefId: string, dateStr: string) => void;
   onDelete: (taskDefId: string) => void;
+  onEdit: (occurrence: ComputedOccurrence) => void;
   onOpenAddModal: () => void;
   carryOverCount: number;
 }
@@ -24,6 +25,7 @@ export function TaskRail({
   tomorrowOccurrences,
   onToggle,
   onDelete,
+  onEdit,
   onOpenAddModal,
   carryOverCount,
 }: TaskRailProps) {
@@ -72,6 +74,7 @@ export function TaskRail({
           occurrences={todayOccurrences}
           onToggle={onToggle}
           onDelete={onDelete}
+          onEdit={onEdit}
           emptyText="No tasks scheduled for today. Create one with [+ Add New Task] or press Ctrl + N key."
         />
 
@@ -82,6 +85,7 @@ export function TaskRail({
           occurrences={tomorrowOccurrences}
           onToggle={onToggle}
           onDelete={onDelete}
+          onEdit={onEdit}
           emptyText="No tasks scheduled for tomorrow."
         />
       </div>

@@ -31,6 +31,7 @@ export default function Home() {
     analytics,
     isLoading: isTasksLoading,
     addTask,
+    editTask,
     toggleOccurrence,
     deleteTask,
     removeAllTasks,
@@ -54,6 +55,9 @@ export default function Home() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isRemoveAllModalOpen, setIsRemoveAllModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<
+    import("@/lib/engine/types").ComputedOccurrence | null
+  >(null);
   const [isRemoving, setIsRemoving] = useState(false);
   const [mobileTab, setMobileTab] = useState<"tasks" | "analytics">("tasks");
 
@@ -263,7 +267,14 @@ export default function Home() {
               tomorrowOccurrences={tomorrowOccurrences}
               onToggle={toggleOccurrence}
               onDelete={deleteTask}
-              onOpenAddModal={() => setIsAddModalOpen(true)}
+              onEdit={(occurrence) => {
+                setEditingTask(occurrence);
+                setIsAddModalOpen(true);
+              }}
+              onOpenAddModal={() => {
+                setEditingTask(null);
+                setIsAddModalOpen(true);
+              }}
               carryOverCount={analytics.carryOverCount}
             />
           )}
@@ -297,9 +308,18 @@ export default function Home() {
 
       {/* Add Task Modal */}
       <AddTaskModal
+        key={`${isAddModalOpen}-${editingTask?.taskDefinitionId || "new"}`}
         isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onAdd={addTask}
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setEditingTask(null);
+        }}
+        onSave={
+          editingTask
+            ? (params) => editTask(editingTask.taskDefinitionId, params)
+            : addTask
+        }
+        taskToEdit={editingTask}
       />
 
       {/* Remove All Data Confirmation Modal */}

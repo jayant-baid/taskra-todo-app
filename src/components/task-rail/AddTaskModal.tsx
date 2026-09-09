@@ -1,31 +1,42 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Repeat, Plus } from 'lucide-react';
-import { Modal } from '@/components/ui/Modal';
-import { Button } from '@/components/ui/Button';
-import { getLocalDateString } from '@/lib/engine/dateUtils';
+import React, { useState } from "react";
+import { Repeat, Plus, Pencil } from "lucide-react";
+import { ComputedOccurrence } from "@/lib/engine/types";
+import { Modal } from "@/components/ui/Modal";
+import { Button } from "@/components/ui/Button";
+import { getLocalDateString } from "@/lib/engine/dateUtils";
 
 export interface AddTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (task: {
+  onSave: (task: {
     title: string;
     description?: string;
     isRecurring: boolean;
-    recurrenceRule?: 'daily' | 'weekly';
+    recurrenceRule?: "daily" | "weekly";
     startDate?: string;
   }) => Promise<unknown>;
+  taskToEdit?: ComputedOccurrence | null;
 }
 
-export function AddTaskModal({ isOpen, onClose, onAdd }: AddTaskModalProps) {
+export function AddTaskModal({
+  isOpen,
+  onClose,
+  onSave,
+  taskToEdit,
+}: AddTaskModalProps) {
   const today = getLocalDateString();
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [isRecurring, setIsRecurring] = useState(false);
-  const [recurrenceRule, setRecurrenceRule] = useState<'daily' | 'weekly'>('daily');
-  const [startDate, setStartDate] = useState(today);
+  const [title, setTitle] = useState(taskToEdit?.title || "");
+  const [description, setDescription] = useState(taskToEdit?.description || "");
+  const [isRecurring, setIsRecurring] = useState(
+    taskToEdit?.isRecurring || false,
+  );
+  const [recurrenceRule, setRecurrenceRule] = useState<"daily" | "weekly">(
+    taskToEdit?.recurrenceRule === "weekly" ? "weekly" : "daily",
+  );
+  const [startDate, setStartDate] = useState(taskToEdit?.startDate || today);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,7 +45,7 @@ export function AddTaskModal({ isOpen, onClose, onAdd }: AddTaskModalProps) {
 
     try {
       setIsSubmitting(true);
-      await onAdd({
+      await onSave({
         title,
         description: description.trim() || undefined,
         isRecurring,
@@ -43,14 +54,14 @@ export function AddTaskModal({ isOpen, onClose, onAdd }: AddTaskModalProps) {
       });
 
       // Reset form
-      setTitle('');
-      setDescription('');
+      setTitle("");
+      setDescription("");
       setIsRecurring(false);
-      setRecurrenceRule('daily');
+      setRecurrenceRule("daily");
       setStartDate(today);
       onClose();
     } catch (err) {
-      console.error('Error creating task:', err);
+      console.error("Error creating task:", err);
     } finally {
       setIsSubmitting(false);
     }
@@ -60,13 +71,20 @@ export function AddTaskModal({ isOpen, onClose, onAdd }: AddTaskModalProps) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Create New Task"
-      subtitle="Define a one-off daily task or an indefinite recurring routine"
+      title={taskToEdit ? "Edit Task" : "Create New Task"}
+      subtitle={
+        taskToEdit
+          ? "Save a new version while preserving the previous task history"
+          : "Define a one-off daily task or an indefinite recurring routine"
+      }
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {/* Title */}
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="task-title" className="text-xs font-semibold text-[#8B92A3]">
+          <label
+            htmlFor="task-title"
+            className="text-xs font-semibold text-[#8B92A3]"
+          >
             Title <span className="text-[#FF6B6B]">*</span>
           </label>
           <input
@@ -83,8 +101,12 @@ export function AddTaskModal({ isOpen, onClose, onAdd }: AddTaskModalProps) {
 
         {/* Description */}
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="task-description" className="text-xs font-semibold text-[#8B92A3]">
-            Description <span className="text-[#5C6272] font-normal">(optional)</span>
+          <label
+            htmlFor="task-description"
+            className="text-xs font-semibold text-[#8B92A3]"
+          >
+            Description{" "}
+            <span className="text-[#5C6272] font-normal">(optional)</span>
           </label>
           <textarea
             id="task-description"
@@ -99,13 +121,18 @@ export function AddTaskModal({ isOpen, onClose, onAdd }: AddTaskModalProps) {
         {/* Recurring Toggle Switch */}
         <div className="flex items-center justify-between p-3 bg-[#14161A] border border-[#2A2E37] rounded-[3px]">
           <div className="flex items-center gap-2">
-            <Repeat size={15} className={isRecurring ? 'text-[#5B7FFF]' : 'text-[#8B92A3]'} />
+            <Repeat
+              size={15}
+              className={isRecurring ? "text-[#5B7FFF]" : "text-[#8B92A3]"}
+            />
             <div>
-              <div className="text-xs font-medium text-[#E4E6EB]">Recurring Task</div>
+              <div className="text-xs font-medium text-[#E4E6EB]">
+                Recurring Task
+              </div>
               <div className="text-[11px] text-[#8B92A3]">
                 {isRecurring
-                  ? 'Runs indefinitely from start date. Each day has its own independent status.'
-                  : 'Carries forward each day automatically until completed.'}
+                  ? "Runs indefinitely from start date. Each day has its own independent status."
+                  : "Carries forward each day automatically until completed."}
               </div>
             </div>
           </div>
@@ -116,13 +143,13 @@ export function AddTaskModal({ isOpen, onClose, onAdd }: AddTaskModalProps) {
             onClick={() => setIsRecurring(!isRecurring)}
             className={`w-9 h-5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer border ${
               isRecurring
-                ? 'bg-[#5B7FFF] border-[#5B7FFF]'
-                : 'bg-[#1C1F26] border-[#383E4C]'
+                ? "bg-[#5B7FFF] border-[#5B7FFF]"
+                : "bg-[#1C1F26] border-[#383E4C]"
             }`}
           >
             <div
               className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${
-                isRecurring ? 'translate-x-4' : 'translate-x-0'
+                isRecurring ? "translate-x-4" : "translate-x-0"
               }`}
             />
           </button>
@@ -134,10 +161,14 @@ export function AddTaskModal({ isOpen, onClose, onAdd }: AddTaskModalProps) {
             <div className="grid grid-cols-2 gap-3">
               {/* Frequency */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-[#8B92A3]">Recurrence Rule</label>
+                <label className="text-xs font-semibold text-[#8B92A3]">
+                  Recurrence Rule
+                </label>
                 <select
                   value={recurrenceRule}
-                  onChange={(e) => setRecurrenceRule(e.target.value as 'daily' | 'weekly')}
+                  onChange={(e) =>
+                    setRecurrenceRule(e.target.value as "daily" | "weekly")
+                  }
                   className="px-2.5 py-1.5 text-xs bg-[#1C1F26] border border-[#2A2E37] rounded-[3px] text-[#E4E6EB] focus:outline-none focus:border-[#5B7FFF] cursor-pointer"
                 >
                   <option value="daily">Daily (Every day)</option>
@@ -161,19 +192,36 @@ export function AddTaskModal({ isOpen, onClose, onAdd }: AddTaskModalProps) {
               </div>
             </div>
             <p className="text-[11px] text-[#8B92A3] leading-tight">
-              No end date. Will run indefinitely until deleted from a future date.
+              No end date. Will run indefinitely until deleted from a future
+              date.
             </p>
           </div>
         )}
 
         {/* Footer */}
         <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#2A2E37]">
-          <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
-          <Button type="submit" variant="primary" disabled={!title.trim() || isSubmitting} className="gap-1.5">
-            <Plus size={14} />
-            <span>{isSubmitting ? 'Creating...' : 'Create Task'}</span>
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={!title.trim() || isSubmitting}
+            className="gap-1.5"
+          >
+            {taskToEdit ? <Pencil size={14} /> : <Plus size={14} />}
+            <span>
+              {isSubmitting
+                ? "Saving..."
+                : taskToEdit
+                  ? "Save Changes"
+                  : "Create Task"}
+            </span>
           </Button>
         </div>
       </form>

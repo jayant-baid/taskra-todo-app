@@ -1,21 +1,32 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { db, clearAllLocalData } from '../db/dexie';
-import { TaskDefinition, TaskOccurrence } from '../engine/types';
-import { getLocalDateString, addDays, getWeekDays } from '../engine/dateUtils';
-import { computeOccurrencesForDate, computeDaySummary, computeAnalytics, computeMonthlyData } from '../engine/taskEngine';
-import { broadcastMutation, subscribeToMutations } from '../sync/broadcast';
-import { queueSyncItem, initBackgroundSync, flushSyncQueue, pullServerState } from '../sync/syncManager';
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { db, clearAllLocalData } from "../db/dexie";
+import { TaskDefinition, TaskOccurrence } from "../engine/types";
+import { getLocalDateString, addDays, getWeekDays } from "../engine/dateUtils";
+import {
+  computeOccurrencesForDate,
+  computeDaySummary,
+  computeAnalytics,
+  computeMonthlyData,
+} from "../engine/taskEngine";
+import { broadcastMutation, subscribeToMutations } from "../sync/broadcast";
+import {
+  queueSyncItem,
+  initBackgroundSync,
+  flushSyncQueue,
+  pullServerState,
+} from "../sync/syncManager";
 
 export function useTasks() {
   const [taskDefinitions, setTaskDefinitions] = useState<TaskDefinition[]>([]);
   const [taskOccurrences, setTaskOccurrences] = useState<TaskOccurrence[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeWeekCenterDate, setActiveWeekCenterDate] = useState<string>(getLocalDateString());
+  const [activeWeekCenterDate, setActiveWeekCenterDate] =
+    useState<string>(getLocalDateString());
   const [activeMonthStr, setActiveMonthStr] = useState<string>(() => {
     const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   });
 
   const todayStr = useMemo(() => getLocalDateString(), []);
@@ -29,7 +40,7 @@ export function useTasks() {
       setTaskDefinitions(defs);
       setTaskOccurrences(occs);
     } catch (err) {
-      console.error('[useTasks] Error loading tasks from IndexedDB:', err);
+      console.error("[useTasks] Error loading tasks from IndexedDB:", err);
     } finally {
       setIsLoading(false);
     }
@@ -44,7 +55,7 @@ export function useTasks() {
         await refreshFromDB();
       }
     } catch (err) {
-      console.warn('[useTasks] Server sync error:', err);
+      console.warn("[useTasks] Server sync error:", err);
     }
   }, [refreshFromDB]);
 
@@ -53,7 +64,7 @@ export function useTasks() {
     await clearAllLocalData();
     setTaskDefinitions([]);
     setTaskOccurrences([]);
-    broadcastMutation('TASK_MUTATED');
+    broadcastMutation("TASK_MUTATED");
   }, []);
 
   // Initialize DB, background sync listeners, and cross-tab BroadcastChannel
@@ -72,7 +83,10 @@ export function useTasks() {
         setTaskDefinitions(defs);
         setTaskOccurrences(occs);
       } catch (err) {
-        console.error('[useTasks] Error initializing tasks from IndexedDB:', err);
+        console.error(
+          "[useTasks] Error initializing tasks from IndexedDB:",
+          err,
+        );
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -101,7 +115,7 @@ export function useTasks() {
       title: string;
       description?: string;
       isRecurring: boolean;
-      recurrenceRule?: 'daily' | 'weekly';
+      recurrenceRule?: "daily" | "weekly";
       startDate?: string;
     }) => {
       const now = new Date();
@@ -112,10 +126,12 @@ export function useTasks() {
         title: params.title.trim(),
         description: params.description?.trim() || undefined,
         isRecurring: params.isRecurring,
-        recurrenceRule: params.isRecurring ? (params.recurrenceRule || 'daily') : undefined,
+        recurrenceRule: params.isRecurring
+          ? params.recurrenceRule || "daily"
+          : undefined,
         startDate: effectiveStartDate,
         createdAt: now.toISOString(),
-        status: 'active',
+        status: "active",
       };
 
       // Optimistic update
@@ -123,13 +139,63 @@ export function useTasks() {
 
       // DB write
       await db.taskDefinitions.put(newTask);
-      await queueSyncItem('UPSERT_TASK', newTask);
-      broadcastMutation('TASK_MUTATED');
+      await queueSyncItem("UPSERT_TASK", newTask);
+      broadcastMutation("TASK_MUTATED");
       void flushSyncQueue();
 
       return newTask;
     },
-    [todayStr]
+    [todayStr],
+  );
+
+  // Editing creates a new definition so the original values remain in history.
+  const editTask = useCallback(
+    async (
+      taskDefId: string,
+      params: {
+        title: string;
+        description?: string;
+        isRecurring: boolean;
+        recurrenceRule?: "daily" | "weekly";
+        startDate?: string;
+      },
+    ) => {
+      const task = taskDefinitions.find((t) => t.id === taskDefId);
+      if (!task) return;
+
+      const deletedTask: TaskDefinition = {
+        ...task,
+        deletedFrom: todayStr,
+        status: "deleted",
+      };
+      const now = new Date();
+      const newTask: TaskDefinition = {
+        id: `task_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        title: params.title.trim(),
+        description: params.description?.trim() || undefined,
+        isRecurring: params.isRecurring,
+        recurrenceRule: params.isRecurring
+          ? params.recurrenceRule || "daily"
+          : undefined,
+        startDate: params.startDate || todayStr,
+        createdAt: now.toISOString(),
+        status: "active",
+      };
+
+      setTaskDefinitions((prev) =>
+        prev
+          .map((current) => (current.id === taskDefId ? deletedTask : current))
+          .concat(newTask),
+      );
+      await db.taskDefinitions.bulkPut([deletedTask, newTask]);
+      await queueSyncItem("UPSERT_TASK", deletedTask);
+      await queueSyncItem("UPSERT_TASK", newTask);
+      broadcastMutation("TASK_MUTATED");
+      void flushSyncQueue();
+
+      return newTask;
+    },
+    [taskDefinitions, todayStr],
   );
 
   // Toggle Occurrence Completion
@@ -137,23 +203,25 @@ export function useTasks() {
     async (taskDefId: string, dateStr: string) => {
       const key = `${taskDefId}_${dateStr}`;
       const existingOcc = taskOccurrences.find(
-        (o) => o.taskDefinitionId === taskDefId && o.date === dateStr
+        (o) => o.taskDefinitionId === taskDefId && o.date === dateStr,
       );
 
-      const nextStatus = existingOcc?.status === 'completed' ? 'pending' : 'completed';
+      const nextStatus =
+        existingOcc?.status === "completed" ? "pending" : "completed";
       const updatedOcc: TaskOccurrence = {
         id: existingOcc?.id || key,
         taskDefinitionId: taskDefId,
         date: dateStr,
         status: nextStatus,
-        completedAt: nextStatus === 'completed' ? new Date().toISOString() : undefined,
+        completedAt:
+          nextStatus === "completed" ? new Date().toISOString() : undefined,
         updatedAt: new Date().toISOString(),
       };
 
       // Optimistic update
       setTaskOccurrences((prev) => {
         const index = prev.findIndex(
-          (o) => o.taskDefinitionId === taskDefId && o.date === dateStr
+          (o) => o.taskDefinitionId === taskDefId && o.date === dateStr,
         );
         if (index >= 0) {
           const next = [...prev];
@@ -165,11 +233,11 @@ export function useTasks() {
 
       // DB write
       await db.taskOccurrences.put(updatedOcc);
-      await queueSyncItem('UPSERT_OCCURRENCE', updatedOcc);
-      broadcastMutation('TASK_MUTATED');
+      await queueSyncItem("UPSERT_OCCURRENCE", updatedOcc);
+      broadcastMutation("TASK_MUTATED");
       void flushSyncQueue();
     },
-    [taskOccurrences]
+    [taskOccurrences],
   );
 
   // Delete Individual Task with correct semantics (§3.3)
@@ -186,48 +254,51 @@ export function useTasks() {
         const updatedTask: TaskDefinition = {
           ...task,
           deletedFrom: todayStr,
-          status: 'deleted',
+          status: "deleted",
         };
 
         setTaskDefinitions((prev) =>
-          prev.map((t) => (t.id === taskDefId ? updatedTask : t))
+          prev.map((t) => (t.id === taskDefId ? updatedTask : t)),
         );
         await db.taskDefinitions.put(updatedTask);
-        await queueSyncItem('UPSERT_TASK', updatedTask);
+        await queueSyncItem("UPSERT_TASK", updatedTask);
       } else {
         // Non-recurring task delete:
         // Soft delete definition with deletedFrom = todayStr so past history remains preserved
         const updatedTask: TaskDefinition = {
           ...task,
           deletedFrom: todayStr,
-          status: 'deleted',
+          status: "deleted",
         };
 
         setTaskDefinitions((prev) =>
-          prev.map((t) => (t.id === taskDefId ? updatedTask : t))
+          prev.map((t) => (t.id === taskDefId ? updatedTask : t)),
         );
         await db.taskDefinitions.put(updatedTask);
-        await queueSyncItem('DELETE_TASK', { id: taskDefId, deletedFrom: todayStr });
+        await queueSyncItem("DELETE_TASK", {
+          id: taskDefId,
+          deletedFrom: todayStr,
+        });
       }
 
-      broadcastMutation('TASK_MUTATED');
+      broadcastMutation("TASK_MUTATED");
       void flushSyncQueue();
     },
-    [taskDefinitions, todayStr]
+    [taskDefinitions, todayStr],
   );
 
   // Remove All Data (Removes all active today & upcoming tasks, preserving past records)
   const removeAllTasks = useCallback(async () => {
     // Soft delete all active definitions from today onward
-    const activeTasks = taskDefinitions.filter((t) => t.status === 'active');
+    const activeTasks = taskDefinitions.filter((t) => t.status === "active");
     if (activeTasks.length === 0) return;
 
     const updatedTasks = taskDefinitions.map((task) => {
-      if (task.status === 'active') {
+      if (task.status === "active") {
         return {
           ...task,
           deletedFrom: todayStr,
-          status: 'deleted' as const,
+          status: "deleted" as const,
         };
       }
       return task;
@@ -235,25 +306,35 @@ export function useTasks() {
 
     setTaskDefinitions(updatedTasks);
     await db.taskDefinitions.bulkPut(updatedTasks);
-    await queueSyncItem('REMOVE_ALL', { deletedFrom: todayStr });
-    broadcastMutation('TASK_MUTATED');
+    await queueSyncItem("REMOVE_ALL", { deletedFrom: todayStr });
+    broadcastMutation("TASK_MUTATED");
     void flushSyncQueue();
   }, [taskDefinitions, todayStr]);
 
   // Derived: Today and Tomorrow occurrences
   const todayOccurrences = useMemo(() => {
-    return computeOccurrencesForDate(todayStr, taskDefinitions, taskOccurrences, todayStr);
+    return computeOccurrencesForDate(
+      todayStr,
+      taskDefinitions,
+      taskOccurrences,
+      todayStr,
+    );
   }, [todayStr, taskDefinitions, taskOccurrences]);
 
   const tomorrowOccurrences = useMemo(() => {
-    return computeOccurrencesForDate(tomorrowStr, taskDefinitions, taskOccurrences, todayStr);
+    return computeOccurrencesForDate(
+      tomorrowStr,
+      taskDefinitions,
+      taskOccurrences,
+      todayStr,
+    );
   }, [tomorrowStr, taskDefinitions, taskOccurrences, todayStr]);
 
   // Derived: Week summaries for the Calendar view
   const weekSummaries = useMemo(() => {
     const weekDates = getWeekDays(activeWeekCenterDate, true);
     return weekDates.map((dateStr) =>
-      computeDaySummary(dateStr, taskDefinitions, taskOccurrences, todayStr)
+      computeDaySummary(dateStr, taskDefinitions, taskOccurrences, todayStr),
     );
   }, [activeWeekCenterDate, taskDefinitions, taskOccurrences, todayStr]);
 
@@ -265,9 +346,14 @@ export function useTasks() {
   // Helper to query occurrences for any custom date (e.g. when opening past day modal)
   const getOccurrencesForDate = useCallback(
     (dateStr: string) => {
-      return computeOccurrencesForDate(dateStr, taskDefinitions, taskOccurrences, todayStr);
+      return computeOccurrencesForDate(
+        dateStr,
+        taskDefinitions,
+        taskOccurrences,
+        todayStr,
+      );
     },
-    [taskDefinitions, taskOccurrences, todayStr]
+    [taskDefinitions, taskOccurrences, todayStr],
   );
 
   // Week navigation helpers
@@ -293,6 +379,7 @@ export function useTasks() {
     analytics,
     isLoading,
     addTask,
+    editTask,
     toggleOccurrence,
     deleteTask,
     removeAllTasks,
