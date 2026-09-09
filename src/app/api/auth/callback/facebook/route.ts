@@ -21,7 +21,7 @@ export async function GET(request: Request) {
 
   try {
     const profile = await exchangeFacebookCode(code, origin);
-    const { token, expiresAt } = findOrCreateOAuthUser(profile);
+    const { token, expiresAt } = await findOrCreateOAuthUser(profile);
 
     const redirectResponse = NextResponse.redirect(
       `${origin}/auth/callback?provider=facebook&token=${encodeURIComponent(token)}`,

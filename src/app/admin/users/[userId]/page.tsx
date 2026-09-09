@@ -16,6 +16,7 @@ import {
   computeMonthlyData,
 } from "@/lib/engine/taskEngine";
 import { TaskDefinition, TaskOccurrence } from "@/lib/engine/types";
+import { getClientToken } from "@/lib/hooks/useAuth";
 
 type UserDetails = {
   user: {
@@ -64,6 +65,10 @@ export default function AdminUserDetailsPage({
       fetch(`/api/admin/users/${userId}`, {
         credentials: "include",
         cache: "no-store",
+        headers: (() => {
+          const token = getClientToken();
+          return token ? { Authorization: `Bearer ${token}` } : undefined;
+        })(),
       })
         .then(async (response) => {
           const data = await response.json();

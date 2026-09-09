@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { getDatabase } from "./db";
+import { query } from "./db";
 import { createSession, UserRecord } from "./auth";
 
 export interface OAuthProfile {
@@ -168,63 +168,52 @@ export async function exchangeFacebookCode(
   };
 }
 
-export function findOrCreateOAuthUser(profile: OAuthProfile): {
+export async function findOrCreateOAuthUser(profile: OAuthProfile): Promise<{
   user: UserRecord;
   token: string;
   expiresAt: string;
-} {
-  const db = getDatabase();
-
+}> {
   // 1. Try to find user by provider and providerId
   let user: UserRecord | undefined;
-  const findByProviderStmt = db.prepare(`
+  const providerUsers = await query<UserRecord>(
+    `
     SELECT id, username, role, created_at
     FROM users
     WHERE provider = ? AND provider_id = ?
-  `);
-  const existingProviderUser = findByProviderStmt.get(
-    profile.provider,
-    profile.providerId,
-  ) as
-    | {
-        id: string;
-        username: string;
-        role: "user" | "admin";
-        created_at: string;
-      }
-    | undefined;
+  `,
+    [profile.provider, profile.providerId],
+  );
+  const existingProviderUser = providerUsers[0];
 
   if (existingProviderUser) {
     user = existingProviderUser;
   } else if (profile.email) {
     const normalizedEmail = profile.email.trim().toLowerCase();
     // 2. Try to find user by email to link accounts
-    const findByEmailStmt = db.prepare(`
+    const emailUsers = await query<UserRecord>(
+      `
       SELECT id, username, role, created_at
       FROM users
       WHERE LOWER(email) = ?
-    `);
-    const existingEmailUser = findByEmailStmt.get(normalizedEmail) as
-      | {
-          id: string;
-          username: string;
-          role: "user" | "admin";
-          created_at: string;
-        }
-      | undefined;
+    `,
+      [normalizedEmail],
+    );
+    const existingEmailUser = emailUsers[0];
 
     if (existingEmailUser) {
       // Link provider to this existing user
-      const linkStmt = db.prepare(`
+      await query(
+        `
         UPDATE users
         SET provider = ?, provider_id = ?, avatar_url = COALESCE(?, avatar_url)
         WHERE id = ?
-      `);
-      linkStmt.run(
-        profile.provider,
-        profile.providerId,
-        profile.avatarUrl || null,
-        existingEmailUser.id,
+      `,
+        [
+          profile.provider,
+          profile.providerId,
+          profile.avatarUrl || null,
+          existingEmailUser.id,
+        ],
       );
       user = existingEmailUser;
     }
@@ -241,31 +230,35 @@ export function findOrCreateOAuthUser(profile: OAuthProfile): {
         .substring(0, 30) || "user";
     let username = cleanBaseName;
     let usernameSuffix = 2;
-    const usernameExistsStmt = db.prepare(
-      "SELECT 1 FROM users WHERE username = ? COLLATE NOCASE LIMIT 1",
-    );
-    while (usernameExistsStmt.get(username)) {
+    while (
+      (
+        await query(
+          "SELECT 1 FROM users WHERE LOWER(username) = LOWER(?) LIMIT 1",
+          [username],
+        )
+      ).length > 0
+    ) {
       username = `${cleanBaseName}_${usernameSuffix}`;
       usernameSuffix += 1;
     }
     const createdAt = new Date().toISOString();
 
-    const insertStmt = db.prepare(`
+    await query(
+      `
       INSERT INTO users (id, username, email, password_hash, salt, provider, provider_id, avatar_url, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-    const randomOAuthSecret = `oauth_${crypto.randomBytes(32).toString("hex")}`;
-    const randomOAuthSalt = `oauth_${crypto.randomBytes(16).toString("hex")}`;
-    insertStmt.run(
-      userId,
-      username,
-      profile.email?.trim().toLowerCase() || null,
-      randomOAuthSecret,
-      randomOAuthSalt,
-      profile.provider,
-      profile.providerId,
-      profile.avatarUrl || null,
-      createdAt,
+    `,
+      [
+        userId,
+        username,
+        profile.email?.trim().toLowerCase() || null,
+        `oauth_${crypto.randomBytes(32).toString("hex")}`,
+        `oauth_${crypto.randomBytes(16).toString("hex")}`,
+        profile.provider,
+        profile.providerId,
+        profile.avatarUrl || null,
+        createdAt,
+      ],
     );
 
     user = {
@@ -277,6 +270,6 @@ export function findOrCreateOAuthUser(profile: OAuthProfile): {
   }
 
   // 4. Create 30-day session
-  const { token, expiresAt } = createSession(user.id);
+  const { token, expiresAt } = await createSession(user.id);
   return { user, token, expiresAt };
 }

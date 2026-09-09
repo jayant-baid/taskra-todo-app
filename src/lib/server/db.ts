@@ -1,35 +1,55 @@
-import { DatabaseSync } from "node:sqlite";
-import path from "node:path";
-import fs from "node:fs";
+import { Pool, PoolClient, QueryResultRow } from "pg";
 
-let dbInstance: DatabaseSync | null = null;
+let pool: Pool | null = null;
+let initialization: Promise<void> | null = null;
 
-export function getDatabase(): DatabaseSync {
-  if (dbInstance) {
-    return dbInstance;
+function getPool(): Pool {
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is required for the PostgreSQL database");
   }
+  if (!pool) pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  return pool;
+}
 
-  const dbPath =
-    process.env.DATABASE_PATH ||
-    (process.env.VERCEL
-      ? path.join("/tmp", "taskra", "app.db")
-      : path.join(process.cwd(), "data", "app.db"));
-  const dataDir = path.dirname(dbPath);
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+function postgresSql(sql: string): string {
+  let index = 0;
+  return sql.replace(/\?/g, () => `$${++index}`);
+}
+
+export async function query<T extends QueryResultRow = QueryResultRow>(
+  sql: string,
+  params: unknown[] = [],
+): Promise<T[]> {
+  await initializeDatabase();
+  const result = await getPool().query<T>(postgresSql(sql), params);
+  return result.rows;
+}
+
+export async function withTransaction<T>(
+  callback: (client: PoolClient) => Promise<T>,
+): Promise<T> {
+  await initializeDatabase();
+  const client = await getPool().connect();
+  try {
+    await client.query("BEGIN");
+    const result = await callback(client);
+    await client.query("COMMIT");
+    return result;
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
   }
+}
 
-  dbInstance = new DatabaseSync(dbPath);
-
-  // Enable WAL mode for better concurrency
-  dbInstance.exec("PRAGMA journal_mode = WAL;");
-  dbInstance.exec("PRAGMA foreign_keys = ON;");
-
-  // Initialize schema
-  dbInstance.exec(`
+export async function initializeDatabase(): Promise<void> {
+  if (!initialization) {
+    initialization = (async () => {
+      await getPool().query(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
-      username TEXT UNIQUE NOT NULL COLLATE NOCASE,
+      username TEXT UNIQUE NOT NULL,
       email TEXT,
       password_hash TEXT,
       salt TEXT,
@@ -53,7 +73,7 @@ export function getDatabase(): DatabaseSync {
       user_id TEXT NOT NULL,
       title TEXT NOT NULL,
       description TEXT,
-      is_recurring INTEGER NOT NULL,
+      is_recurring BOOLEAN NOT NULL,
       recurrence_rule TEXT,
       start_date TEXT NOT NULL,
       created_at TEXT NOT NULL,
@@ -78,45 +98,12 @@ export function getDatabase(): DatabaseSync {
 
     CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
     CREATE INDEX IF NOT EXISTS idx_task_defs_user ON task_definitions(user_id);
-    CREATE INDEX IF NOT EXISTS idx_task_occs_user ON task_occurrences(user_id);
-  `);
-
-  // Migrate columns if table already existed from earlier runs
-  try {
-    const columns = dbInstance
-      .prepare("PRAGMA table_info(users)")
-      .all() as Array<{ name: string }>;
-    const columnNames = new Set(columns.map((c) => c.name));
-
-    if (!columnNames.has("email")) {
-      dbInstance.exec("ALTER TABLE users ADD COLUMN email TEXT;");
-    }
-    if (!columnNames.has("provider")) {
-      dbInstance.exec(
-        "ALTER TABLE users ADD COLUMN provider TEXT DEFAULT 'local';",
-      );
-    }
-    if (!columnNames.has("provider_id")) {
-      dbInstance.exec("ALTER TABLE users ADD COLUMN provider_id TEXT;");
-    }
-    if (!columnNames.has("avatar_url")) {
-      dbInstance.exec("ALTER TABLE users ADD COLUMN avatar_url TEXT;");
-    }
-    if (!columnNames.has("role")) {
-      dbInstance.exec(
-        "ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user';",
-      );
-    }
-
-    dbInstance.exec(
-      "CREATE INDEX IF NOT EXISTS idx_users_oauth ON users(provider, provider_id);",
-    );
-    dbInstance.exec(
-      "CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);",
-    );
-  } catch (err) {
-    console.warn("[DB Migration Warning]:", err);
+      `);
+    })();
   }
+  await initialization;
+}
 
-  return dbInstance;
+export function getDatabase(): Pool {
+  return getPool();
 }

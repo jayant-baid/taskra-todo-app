@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { getClientToken } from "@/lib/hooks/useAuth";
 
 type Overview = {
   summary: {
@@ -56,7 +57,12 @@ export default function AdminPage() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch("/api/admin/overview", { credentials: "include", cache: "no-store" })
+    const token = getClientToken();
+    fetch("/api/admin/overview", {
+      credentials: "include",
+      cache: "no-store",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    })
       .then(async (response) => {
         const data = await response.json();
         if (!response.ok)

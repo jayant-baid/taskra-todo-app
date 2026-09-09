@@ -3,7 +3,7 @@ import { getAuthUser } from "@/lib/server/auth";
 
 export async function GET(request: Request) {
   try {
-    const user = getAuthUser(request);
+    const user = await getAuthUser(request);
     if (!user) {
       return NextResponse.json({ success: true, user: null });
     }
@@ -19,6 +19,9 @@ export async function GET(request: Request) {
     });
   } catch (err: unknown) {
     console.error("Auth check error:", err);
-    return NextResponse.json({ success: true, user: null });
+    return NextResponse.json(
+      { success: false, error: "Unable to check authentication status" },
+      { status: 500 },
+    );
   }
 }

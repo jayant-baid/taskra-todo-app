@@ -217,10 +217,19 @@ If you are changing task behavior, especially around recurrence, streak logic, o
 
 The app includes server-side auth/sync flows and browser-based OAuth, so deployment should provide the environment and storage expected by the app. The project is already structured for a Next.js deployment target, but the production environment must support:
 
-- database access for user/session storage
+- database access for user/session storage on persistent storage; the database must not live in a serverless `/tmp` directory
+- `DATABASE_PATH` set to the mounted persistent SQLite file when deploying to a host with a persistent volume
 - OAuth callback configuration for Google and Facebook
 - static asset hosting for the app shell and any branding assets
 - sync and auth endpoints exposed through the Next.js runtime
+
+Create the `dragonmaster` admin account once with a direct SQL seed after the schema is initialized. On Vercel, `/tmp` is not persistent or shared between function instances, so use the PostgreSQL database configured by `DATABASE_URL`.
+
+To seed it without application bootstrap logic, register `dragonmaster` once through the app, then run this directly in the PostgreSQL Query Tool:
+
+```sql
+UPDATE users SET role = 'admin' WHERE username = 'dragonmaster';
+```
 
 ## Summary
 

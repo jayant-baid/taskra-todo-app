@@ -20,7 +20,7 @@ export async function GET(request: Request) {
 
   try {
     const profile = await exchangeGoogleCode(code, origin);
-    const { token, expiresAt } = findOrCreateOAuthUser(profile);
+    const { token, expiresAt } = await findOrCreateOAuthUser(profile);
 
     const redirectResponse = NextResponse.redirect(
       `${origin}/auth/callback?provider=google&token=${encodeURIComponent(token)}`,

@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { getDatabase } from "./db";
+import { query } from "./db";
 
 export interface UserRecord {
   id: string;
@@ -18,102 +18,49 @@ export function generateSalt(): string {
   return crypto.randomBytes(16).toString("hex");
 }
 
-export function createSession(userId: string): {
-  token: string;
-  expiresAt: string;
-} {
-  const db = getDatabase();
+export async function createSession(
+  userId: string,
+): Promise<{ token: string; expiresAt: string }> {
   const token = crypto.randomUUID();
   const now = new Date();
-  // 30-day session
-  const expires = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-  const nowIso = now.toISOString();
-  const expiresIso = expires.toISOString();
-
-  const stmt = db.prepare(`
-    INSERT INTO sessions (token, user_id, created_at, expires_at)
-    VALUES (?, ?, ?, ?)
-  `);
-  stmt.run(token, userId, nowIso, expiresIso);
-
-  return { token, expiresAt: expiresIso };
+  const expiresAt = new Date(
+    now.getTime() + 30 * 24 * 60 * 60 * 1000,
+  ).toISOString();
+  await query(
+    "INSERT INTO sessions (token, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)",
+    [token, userId, now.toISOString(), expiresAt],
+  );
+  return { token, expiresAt };
 }
 
-export function deleteSession(token: string): void {
-  const db = getDatabase();
-  const stmt = db.prepare("DELETE FROM sessions WHERE token = ?");
-  stmt.run(token);
+export async function deleteSession(token: string): Promise<void> {
+  await query("DELETE FROM sessions WHERE token = ?", [token]);
 }
 
-export function getUserFromToken(token: string): UserRecord | null {
+export async function getUserFromToken(
+  token: string,
+): Promise<UserRecord | null> {
   if (!token) return null;
-  const db = getDatabase();
-  const nowIso = new Date().toISOString();
-
-  const stmt = db.prepare(`
-    SELECT u.id, u.username, u.role, u.created_at
-    FROM sessions s
-    JOIN users u ON s.user_id = u.id
-    WHERE s.token = ? AND s.expires_at > ?
-  `);
-
-  const row = stmt.get(token, nowIso) as
-    | {
-        id: string;
-        username: string;
-        role: "user" | "admin";
-        created_at: string;
-      }
-    | undefined;
-  if (!row) return null;
-
-  return {
-    id: row.id,
-    username: row.username,
-    role: row.role,
-    created_at: row.created_at,
-  };
+  const rows = await query<UserRecord>(
+    `SELECT u.id, u.username, u.role, u.created_at
+     FROM sessions s JOIN users u ON s.user_id = u.id
+     WHERE s.token = ? AND s.expires_at > ?`,
+    [token, new Date().toISOString()],
+  );
+  return rows[0] || null;
 }
 
 export function extractTokenFromRequest(request: Request): string | null {
-  // 1. Check Authorization: Bearer <token>
-  const authHeader =
-    request.headers.get("Authorization") ||
-    request.headers.get("authorization");
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    return authHeader.substring(7).trim();
-  }
-
-  // 2. Check Cookie header
-  const cookieHeader =
-    request.headers.get("cookie") || request.headers.get("Cookie");
-  if (cookieHeader) {
-    const match = cookieHeader.match(/(?:^|;\s*)session_token=([^;]+)/);
-    if (match && match[1]) {
-      return decodeURIComponent(match[1]);
-    }
-  }
-
-  return null;
+  const authHeader = request.headers.get("authorization");
+  if (authHeader?.startsWith("Bearer ")) return authHeader.substring(7).trim();
+  const cookieHeader = request.headers.get("cookie");
+  const match = cookieHeader?.match(/(?:^|;\s*)session_token=([^;]+)/);
+  return match?.[1] ? decodeURIComponent(match[1]) : null;
 }
 
-export function getAuthUser(request: Request): UserRecord | null {
-  const authHeader =
-    request.headers.get("Authorization") ||
-    request.headers.get("authorization");
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    const bearerUser = getUserFromToken(authHeader.substring(7).trim());
-    if (bearerUser) return bearerUser;
-  }
-
-  const cookieHeader =
-    request.headers.get("cookie") || request.headers.get("Cookie");
-  if (cookieHeader) {
-    const match = cookieHeader.match(/(?:^|;\s*)session_token=([^;]+)/);
-    if (match && match[1]) {
-      return getUserFromToken(decodeURIComponent(match[1]));
-    }
-  }
-
-  return null;
+export async function getAuthUser(
+  request: Request,
+): Promise<UserRecord | null> {
+  const token = extractTokenFromRequest(request);
+  return token ? getUserFromToken(token) : null;
 }

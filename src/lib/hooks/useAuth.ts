@@ -23,6 +23,35 @@ export function setClientToken(token: string | null) {
   }
 }
 
+async function fetchAuthStatus(
+  headers: Record<string, string>,
+): Promise<Response> {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      const response = await fetch("/api/auth/me", {
+        headers,
+        credentials: "include",
+        cache: "no-store",
+      });
+
+      if (response.ok || response.status < 500 || attempt === 2) {
+        return response;
+      }
+    } catch (error) {
+      lastError = error;
+      if (attempt === 2) throw error;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 150 * (attempt + 1)));
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("Unable to check authentication status");
+}
+
 export function useAuthInternal() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,10 +90,7 @@ export function useAuthInternal() {
           headers["Authorization"] = `Bearer ${storedToken}`;
         }
 
-        const res = await fetch("/api/auth/me", {
-          headers,
-          credentials: "include",
-        });
+        const res = await fetchAuthStatus(headers);
         if (!isMounted) return;
 
         if (res.ok) {
