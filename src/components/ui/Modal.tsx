@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef } from 'react';
-import { X } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from './Button';
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "./Button";
 
 export interface ModalProps {
   isOpen: boolean;
@@ -20,82 +20,49 @@ export function Modal({
   title,
   subtitle,
   children,
-  maxWidth = 'max-w-lg',
+  maxWidth = "max-w-lg",
 }: ModalProps) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-
-    if (isOpen) {
-      if (!dialog.open) {
-        dialog.showModal();
-      }
-    } else {
-      if (dialog.open) {
-        dialog.close();
-      }
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
   return (
-    <dialog
-      ref={dialogRef}
-      onCancel={(e) => {
-        e.preventDefault();
-        onClose();
-      }}
-      onClick={(e) => {
-        // Light-dismiss if clicking the backdrop outside the dialog box
-        const rect = e.currentTarget.getBoundingClientRect();
-        const isInDialog =
-          rect.top <= e.clientY &&
-          e.clientY <= rect.top + rect.height &&
-          rect.left <= e.clientX &&
-          e.clientX <= rect.left + rect.width;
-        if (!isInDialog) {
-          onClose();
-        }
-      }}
-      className={cn(
-        'm-auto p-0 bg-[#1C1F26] text-[#E4E6EB] border border-[#2A2E37] rounded-[4px] shadow-2xl overflow-hidden w-full focus:outline-none animate-in fade-in zoom-in-95 duration-100',
-        maxWidth
-      )}
+    <DialogPrimitive.Root
+      open={isOpen}
+      onOpenChange={(open) => !open && onClose()}
     >
-      <div className="flex flex-col max-h-[85vh]">
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#2A2E37] bg-[#1C1F26]">
-          <div>
-            <h3 className="text-sm font-semibold tracking-tight text-[#E4E6EB]">{title}</h3>
-            {subtitle && <p className="text-xs text-[#8B92A3] mt-0.5">{subtitle}</p>}
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/75 backdrop-blur-[2px] animate-in fade-in duration-100" />
+        <DialogPrimitive.Content
+          className={cn(
+            "fixed left-1/2 top-1/2 z-50 flex max-h-[85vh] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-[4px] border border-[#2A2E37] bg-[#1C1F26] text-[#E4E6EB] shadow-2xl outline-none animate-in fade-in zoom-in-95 duration-100",
+            maxWidth,
+          )}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#2A2E37] bg-[#1C1F26]">
+            <div>
+              <DialogPrimitive.Title className="text-sm font-semibold tracking-tight text-[#E4E6EB]">
+                {title}
+              </DialogPrimitive.Title>
+              {subtitle && (
+                <DialogPrimitive.Description className="mt-0.5 text-xs text-[#8B92A3]">
+                  {subtitle}
+                </DialogPrimitive.Description>
+              )}
+            </div>
+            <DialogPrimitive.Close asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Close dialog"
+                className="h-6 w-6 text-[#8B92A3] hover:text-[#E4E6EB]"
+              >
+                <X size={15} />
+              </Button>
+            </DialogPrimitive.Close>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            aria-label="Close dialog"
-            className="text-[#8B92A3] hover:text-[#E4E6EB] h-6 w-6"
-          >
-            <X size={15} />
-          </Button>
-        </div>
 
-        {/* Content */}
-        <div className="p-5 overflow-y-auto">{children}</div>
-      </div>
-    </dialog>
+          {/* Content */}
+          <div className="overflow-y-auto p-5">{children}</div>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   );
 }

@@ -1,10 +1,26 @@
 "use client";
 
 import React, { useState } from "react";
-import { Repeat, Plus, Pencil } from "lucide-react";
+import { CalendarDays, Repeat, Plus, Pencil } from "lucide-react";
+import { format, parseISO } from "date-fns";
 import { ComputedOccurrence } from "@/lib/engine/types";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
+import { Calendar } from "@/components/ui/Calendar";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/Select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/Popover";
 import { getLocalDateString } from "@/lib/engine/dateUtils";
 
 export interface AddTaskModalProps {
@@ -37,6 +53,7 @@ export function AddTaskModal({
     taskToEdit?.recurrenceRule === "weekly" ? "weekly" : "daily",
   );
   const [startDate, setStartDate] = useState(taskToEdit?.startDate || today);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -87,7 +104,7 @@ export function AddTaskModal({
           >
             Title <span className="text-[#FF6B6B]">*</span>
           </label>
-          <input
+          <Input
             id="task-title"
             type="text"
             required
@@ -95,7 +112,6 @@ export function AddTaskModal({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Audit cache invalidation logic"
-            className="w-full px-3 py-2 text-sm bg-[#14161A] border border-[#2A2E37] rounded-[3px] text-[#E4E6EB] placeholder-[#5C6272] focus:outline-none focus:border-[#5B7FFF]"
           />
         </div>
 
@@ -108,13 +124,12 @@ export function AddTaskModal({
             Description{" "}
             <span className="text-[#5C6272] font-normal">(optional)</span>
           </label>
-          <textarea
+          <Textarea
             id="task-description"
             rows={2}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Context, requirements, or links..."
-            className="w-full px-3 py-2 text-sm bg-[#14161A] border border-[#2A2E37] rounded-[3px] text-[#E4E6EB] placeholder-[#5C6272] focus:outline-none focus:border-[#5B7FFF] resize-none"
           />
         </div>
 
@@ -164,16 +179,22 @@ export function AddTaskModal({
                 <label className="text-xs font-semibold text-[#8B92A3]">
                   Recurrence Rule
                 </label>
-                <select
+                <Select
                   value={recurrenceRule}
-                  onChange={(e) =>
-                    setRecurrenceRule(e.target.value as "daily" | "weekly")
+                  onValueChange={(value) =>
+                    setRecurrenceRule(value as "daily" | "weekly")
                   }
-                  className="px-2.5 py-1.5 text-xs bg-[#1C1F26] border border-[#2A2E37] rounded-[3px] text-[#E4E6EB] focus:outline-none focus:border-[#5B7FFF] cursor-pointer"
                 >
-                  <option value="daily">Daily (Every day)</option>
-                  <option value="weekly">Weekly (Once per week)</option>
-                </select>
+                  <SelectTrigger aria-label="Recurrence rule">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Daily (Every day)</SelectItem>
+                    <SelectItem value="weekly">
+                      Weekly (Once per week)
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Start Date */}
@@ -181,14 +202,37 @@ export function AddTaskModal({
                 <label className="text-xs font-semibold text-[#8B92A3]">
                   Start Date
                 </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full px-2.5 py-1.5 text-xs bg-[#1C1F26] border border-[#2A2E37] rounded-[3px] text-[#E4E6EB] focus:outline-none focus:border-[#5B7FFF] cursor-pointer"
-                  />
-                </div>
+                <Popover
+                  open={isDatePickerOpen}
+                  onOpenChange={setIsDatePickerOpen}
+                >
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="flex h-9 w-full items-center justify-between gap-2 rounded-[3px] border border-[#2A2E37] bg-[#1C1F26] px-2.5 text-left text-xs text-[#E4E6EB] transition-colors hover:border-[#5B7FFF] focus:outline-none focus:ring-1 focus:ring-[#5B7FFF]/30"
+                      aria-label="Choose task start date"
+                    >
+                      <span>
+                        {format(parseISO(startDate), "EEE, MMM d, yyyy")}
+                      </span>
+                      <CalendarDays
+                        size={14}
+                        className="shrink-0 text-[#5B7FFF]"
+                      />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <Calendar
+                      mode="single"
+                      selected={parseISO(startDate)}
+                      onSelect={(date) => {
+                        if (!date) return;
+                        setStartDate(format(date, "yyyy-MM-dd"));
+                        setIsDatePickerOpen(false);
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
             <p className="text-[11px] text-[#8B92A3] leading-tight">
