@@ -68,18 +68,23 @@ export default function Home() {
   const [isRemoving, setIsRemoving] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [mobileTab, setMobileTab] = useState<"tasks" | "analytics">("tasks");
-  const [theme, setTheme] = useState<"dark" | "light">(() => {
-    if (typeof window === "undefined") return "dark";
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
-    const savedTheme = window.localStorage.getItem("taskra-theme");
-    if (savedTheme === "light" || savedTheme === "dark") {
-      return savedTheme;
-    }
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const savedTheme = window.localStorage.getItem("taskra-theme");
+      if (savedTheme === "light" || savedTheme === "dark") {
+        setTheme(savedTheme);
+        return;
+      }
 
-    return window.matchMedia("(prefers-color-scheme: light)").matches
-      ? "light"
-      : "dark";
-  });
+      if (window.matchMedia("(prefers-color-scheme: light)").matches) {
+        setTheme("light");
+      }
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);

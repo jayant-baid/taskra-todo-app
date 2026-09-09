@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,9 +16,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="h-full">
       <body className="h-full bg-[var(--bg-app)] text-[var(--text-primary)] selection:bg-[#5B7FFF]/30 overflow-hidden">
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`
               (() => {
                 try {
                   const saved = localStorage.getItem('taskra-theme');
@@ -28,9 +28,8 @@ export default function RootLayout({
                   document.documentElement.setAttribute('data-theme', 'dark');
                 }
               })();
-            `,
-          }}
-        />
+            `}
+        </Script>
         {children}
       </body>
     </html>
