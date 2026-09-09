@@ -43,10 +43,6 @@ export function MonthlyView({
   const summaries = monthCells.filter((cell): cell is DaySummary =>
     Boolean(cell),
   );
-  const completedDays = summaries.filter(
-    (summary) =>
-      summary.totalCount > 0 && summary.completedCount === summary.totalCount,
-  ).length;
   const totalCompleted = summaries.reduce(
     (total, summary) => total + summary.completedCount,
     0,

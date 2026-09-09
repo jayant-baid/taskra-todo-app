@@ -129,7 +129,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#14161A] text-[#E4E6EB]">
+    <div className="flex flex-col h-full w-full overflow-hidden bg-[#14161A] text-[#E4E6EB]">
       {/* Top Cockpit Header */}
       <header className="h-12 border-b border-[#2A2E37] bg-[#1C1F26] px-3 sm:px-5 flex items-center justify-between shrink-0 select-none">
         <div className="flex items-center gap-3">

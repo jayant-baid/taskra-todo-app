@@ -5,7 +5,6 @@ import { CalendarDays, CalendarRange } from "lucide-react";
 import { DaySummary, AnalyticsMetrics } from "@/lib/engine/types";
 import { WeeklyView } from "./WeeklyView";
 import { MonthlyView } from "./MonthlyView";
-import { AnalyticsSummary } from "./AnalyticsSummary";
 import { Button } from "@/components/ui/Button";
 
 export interface CalendarDockProps {
