@@ -241,7 +241,7 @@ export function AuthModal({
         </div>
 
         {/* Sync Guarantee Badge */}
-        <div className="flex items-center gap-2 px-3 py-2 bg-[#222630]/60 border border-[#2A2E37] rounded-[3px] text-[11px] text-[#8B92A3]">
+        <div className="flex items-center gap-2 px-3 py-2 bg-[var(--bg-surface-subtle)] border border-[#2A2E37] rounded-[3px] text-[11px] text-[#8B92A3]">
           <ShieldCheck
             size={14}
             className="text-[var(--text-green)] shrink-0"
@@ -298,7 +298,7 @@ export function AuthModal({
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="•••••••"
               className="w-full px-3 py-2 text-sm bg-[#14161A] border border-[#2A2E37] rounded-[3px] text-[#E4E6EB] placeholder-[#5C6272] focus:outline-none focus:border-[#5B7FFF]"
             />
             {mode === "register" && (
