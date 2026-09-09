@@ -13,8 +13,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark h-full bg-[#14161A]">
-      <body className="h-full bg-[#14161A] text-[#E4E6EB] selection:bg-[#5B7FFF]/30 overflow-hidden">
+    <html lang="en" suppressHydrationWarning className="h-full">
+      <body className="h-full bg-[var(--bg-app)] text-[var(--text-primary)] selection:bg-[#5B7FFF]/30 overflow-hidden">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (() => {
+                try {
+                  const saved = localStorage.getItem('taskra-theme');
+                  const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+                  const theme = saved || (prefersLight ? 'light' : 'dark');
+                  document.documentElement.setAttribute('data-theme', theme);
+                } catch (error) {
+                  document.documentElement.setAttribute('data-theme', 'dark');
+                }
+              })();
+            `,
+          }}
+        />
         {children}
       </body>
     </html>

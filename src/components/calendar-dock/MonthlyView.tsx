@@ -90,22 +90,25 @@ export function MonthlyView({
 
   return (
     <div ref={viewRef} className="flex h-full flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <CalendarDays size={16} className="text-[#FF6B6B]" />
-          <h3 className="text-sm font-semibold tracking-tight text-[#E4E6EB]">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <CalendarDays
+            size={16}
+            className="text-[var(--accent-primary)] shrink-0"
+          />
+          <h3 className="text-sm font-semibold tracking-tight text-[var(--text-primary)]">
             Monthly Progress
           </h3>
-          <span className="text-xs text-[#8B92A3]">
+          <span className="text-xs text-[var(--text-secondary)] truncate">
             {formatMonth(monthStr)}
           </span>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           <Button
             variant="secondary"
             size="sm"
             onClick={onCurrentMonth}
-            className="text-[11px]"
+            className="text-[11px] bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border-strong)]"
           >
             This Month
           </Button>
@@ -114,7 +117,7 @@ export function MonthlyView({
             size="icon"
             onClick={onPrevMonth}
             title="Previous month"
-            className="h-7 w-7"
+            className="h-7 w-7 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           >
             <ChevronLeft size={15} />
           </Button>
@@ -123,7 +126,7 @@ export function MonthlyView({
             size="icon"
             onClick={onNextMonth}
             title="Next month"
-            className="h-7 w-7"
+            className="h-7 w-7 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           >
             <ChevronRight size={15} />
           </Button>
@@ -175,13 +178,13 @@ export function MonthlyView({
                     setSelectedDay(summary);
                   }
                 }}
-                className={`relative flex aspect-square flex-col items-center justify-center rounded-[3px] border text-[11px] transition-colors lg:aspect-auto lg:text-[10px] ${
+                className={`relative flex aspect-square flex-col items-center justify-center rounded-[6px] border text-[11px] transition-all duration-150 lg:aspect-auto lg:text-[10px] ${
                   isPerfect
-                    ? "border-[#3DD68C]/50 bg-[#3DD68C]/20 text-[#B8F3D4]"
+                    ? "border-[var(--status-completed)]/40 bg-[var(--status-completed-bg)] text-[var(--text-primary)]"
                     : ratio > 0
-                      ? "border-[#E8B339]/40 bg-[#E8B339]/15 text-[#F4D889]"
-                      : "border-[#2A2E37] bg-[#14161A] text-[#8B92A3]"
-                } cursor-pointer hover:border-[#5B7FFF] hover:bg-[#5B7FFF]/10 focus:outline-none focus:ring-1 focus:ring-[#5B7FFF] ${isToday ? "ring-1 ring-[#5B7FFF] ring-offset-1 ring-offset-[#1C1F26]" : ""}`}
+                      ? "border-[var(--status-pending)]/40 bg-[var(--status-pending-bg)] text-[var(--text-primary)]"
+                      : "border-[var(--border-subtle)] bg-[var(--bg-app)] text-[var(--text-secondary)]"
+                } cursor-pointer hover:border-[var(--accent-primary)] hover:bg-[var(--accent-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/25 ${isToday ? "ring-2 ring-[var(--accent-primary)]/50 ring-offset-1 ring-offset-[var(--bg-surface)]" : ""}`}
                 style={{ height: `${cellSize}px` }}
                 title={`${summary.date}: ${summary.completedCount}/${summary.totalCount} completed`}
               >
@@ -194,7 +197,7 @@ export function MonthlyView({
                 {isPerfect && (
                   <CircleCheck
                     size={8}
-                    className="absolute right-0.5 top-0.5 text-[#3DD68C]"
+                    className="absolute right-0.5 top-0.5 text-[var(--text-green)]"
                   />
                 )}
               </div>
@@ -203,15 +206,17 @@ export function MonthlyView({
         </div>
       </div>
 
-      <div className="flex items-center gap-3 text-[10px] text-[#8B92A3]">
+      <div className="flex items-center gap-3 text-[10px] text-[var(--text-secondary)]">
         <span className="flex items-center gap-1">
-          <i className="h-2 w-2 rounded-[2px] bg-[#3DD68C]/70" /> Complete
+          <i className="h-2 w-2 rounded-[2px] bg-[var(--status-completed)]" />{" "}
+          Complete
         </span>
         <span className="flex items-center gap-1">
-          <i className="h-2 w-2 rounded-[2px] bg-[#E8B339]/70" /> In progress
+          <i className="h-2 w-2 rounded-[2px] bg-[var(--status-pending)]" /> In
+          progress
         </span>
         <span className="flex items-center gap-1">
-          <i className="h-2 w-2 rounded-[2px] bg-[#14161A] border border-[#383E4C]" />{" "}
+          <i className="h-2 w-2 rounded-[2px] bg-[var(--bg-app)] border border-[var(--border-strong)]" />{" "}
           No activity
         </span>
       </div>

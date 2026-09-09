@@ -64,26 +64,29 @@ export function WeeklyView({
   return (
     <div className="flex flex-col gap-3">
       {/* Weekly Header & Controls */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <CalendarIcon size={16} className="text-[#5B7FFF]" />
-          <h3 className="text-sm font-semibold text-[#E4E6EB] tracking-tight">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <CalendarIcon
+            size={16}
+            className="text-[var(--accent-primary)] shrink-0"
+          />
+          <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">
             Weekly Progress
           </h3>
           {firstDay && lastDay && (
-            <span className="hidden sm:inline text-xs text-[#8B92A3]">
+            <span className="hidden sm:inline text-xs text-[var(--text-secondary)] truncate">
               {firstDay.monthName} {firstDay.dayNumber} – {lastDay.monthName}{" "}
               {lastDay.dayNumber}
             </span>
           )}
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           <Button
             variant="secondary"
             size="sm"
             onClick={onCurrentWeek}
-            className="h-7 text-[11px]"
+            className="h-7 text-[11px] bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border-strong)]"
           >
             Current Week
           </Button>
@@ -92,7 +95,7 @@ export function WeeklyView({
             size="icon"
             onClick={onPrevWeek}
             title="Previous Week"
-            className="h-7 w-7"
+            className="h-7 w-7 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           >
             <ChevronLeft size={15} />
           </Button>
@@ -101,7 +104,7 @@ export function WeeklyView({
             size="icon"
             onClick={onNextWeek}
             title="Next Week"
-            className="h-7 w-7"
+            className="h-7 w-7 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           >
             <ChevronRight size={15} />
           </Button>

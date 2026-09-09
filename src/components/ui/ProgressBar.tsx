@@ -1,12 +1,12 @@
-import React from 'react';
-import { cn } from '@/lib/utils';
+import React from "react";
+import { cn } from "@/lib/utils";
 
 export interface ProgressBarProps {
   completed: number;
   total: number;
   showPercentage?: boolean;
   className?: string;
-  size?: 'sm' | 'md';
+  size?: "sm" | "md";
 }
 
 export function ProgressBar({
@@ -14,27 +14,33 @@ export function ProgressBar({
   total,
   showPercentage = true,
   className,
-  size = 'md',
+  size = "md",
 }: ProgressBarProps) {
-  const percentage = total > 0 ? Math.min(100, Math.round((completed / total) * 100)) : 0;
+  const percentage =
+    total > 0 ? Math.min(100, Math.round((completed / total) * 100)) : 0;
 
   // Determine functional status color
-  let barColor = 'bg-[#2A2E37]';
+  let barColor = "bg-[#2A2E37]";
   if (total > 0) {
     if (percentage === 100) {
-      barColor = 'bg-[#3DD68C]';
+      barColor = "bg-[var(--text-green)]";
     } else if (percentage > 0) {
-      barColor = 'bg-[#E8B339]';
+      barColor = "bg-[var(--status-pending)]";
     }
   }
 
-  const heightClass = size === 'sm' ? 'h-1' : 'h-1.5';
+  const heightClass = size === "sm" ? "h-1" : "h-1.5";
 
   return (
-    <div className={cn('flex flex-col gap-1 w-full', className)}>
-      <div className={cn('w-full bg-[#14161A] rounded-[2px] overflow-hidden border border-[#2A2E37]/60', heightClass)}>
+    <div className={cn("flex flex-col gap-1 w-full", className)}>
+      <div
+        className={cn(
+          "w-full bg-[#14161A] rounded-[2px] overflow-hidden border border-[#2A2E37]/60",
+          heightClass,
+        )}
+      >
         <div
-          className={cn('h-full transition-all duration-300', barColor)}
+          className={cn("h-full transition-all duration-300", barColor)}
           style={{ width: `${percentage}%` }}
         />
       </div>
@@ -43,7 +49,9 @@ export function ProgressBar({
           <span>
             {completed}/{total} completed
           </span>
-          <span className={percentage === 100 ? 'text-[#3DD68C]' : ''}>
+          <span
+            className={percentage === 100 ? "text-[var(--text-green)]" : ""}
+          >
             {percentage}%
           </span>
         </div>

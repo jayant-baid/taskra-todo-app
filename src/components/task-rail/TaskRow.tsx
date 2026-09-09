@@ -39,7 +39,7 @@ export function TaskRow({
   return (
     <div
       className={cn(
-        "group flex flex-col border-b border-[#2A2E37]/80 hover:bg-[#222630]/60 transition-colors duration-150 py-2 px-3",
+        "group flex flex-col border-b border-[var(--border-subtle)] hover:bg-[var(--bg-surface-subtle)] transition-colors duration-150 py-2 px-3",
         isCompleted && "opacity-65",
       )}
     >
@@ -55,8 +55,8 @@ export function TaskRow({
               className={cn(
                 "w-4 h-4 rounded-[2px] border flex items-center justify-center transition-all cursor-pointer shrink-0",
                 isCompleted
-                  ? "bg-[#3DD68C] border-[#3DD68C] text-[#14161A]"
-                  : "border-[#383E4C] hover:border-[#5B7FFF] bg-[#14161A]",
+                  ? "bg-[var(--status-completed)] border-[var(--status-completed)] text-[var(--bg-app)]"
+                  : "border-[var(--border-strong)] hover:border-[var(--accent-primary)] bg-[var(--bg-app)]",
               )}
               aria-label={isCompleted ? "Mark incomplete" : "Mark complete"}
             >
@@ -67,14 +67,14 @@ export function TaskRow({
               className={cn(
                 "w-3.5 h-3.5 rounded-[2px] flex items-center justify-center shrink-0",
                 isCompleted
-                  ? "bg-[#3DD68C]/20 text-[#3DD68C] border border-[#3DD68C]/40"
-                  : "bg-[#E8B339]/20 text-[#E8B339] border border-[#E8B339]/40",
+                  ? "bg-[var(--text-green)]/20 text-[var(--text-green)] border border-[var(--text-green)]/40"
+                  : "bg-[var(--status-pending)]/20 text-[var(--status-pending)] border border-[var(--status-pending)]/40",
               )}
             >
               {isCompleted ? (
                 <Check size={10} strokeWidth={3} />
               ) : (
-                <div className="w-1.5 h-1.5 bg-[#E8B339] rounded-full" />
+                <div className="w-1.5 h-1.5 bg-[var(--status-pending)] rounded-full" />
               )}
             </div>
           )}
@@ -85,8 +85,8 @@ export function TaskRow({
                 className={cn(
                   "text-[13px] font-medium leading-tight select-text truncate",
                   isCompleted
-                    ? "line-through text-[#8B92A3]"
-                    : "text-[#E4E6EB]",
+                    ? "line-through text-[var(--text-secondary)]"
+                    : "text-[var(--text-primary)]",
                 )}
                 title={occurrence.title}
               >
@@ -122,7 +122,7 @@ export function TaskRow({
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 text-[#8B92A3] hover:text-[#E4E6EB]"
+              className="h-6 w-6 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
               onClick={() => setIsExpanded(!isExpanded)}
               title="Toggle notes"
             >
@@ -169,7 +169,7 @@ export function TaskRow({
 
       {/* Expandable description */}
       {isExpanded && occurrence.description && (
-        <div className="mt-1.5 pl-6 pr-2 text-xs text-[#8B92A3] leading-relaxed border-l-2 border-[#2A2E37] ml-2">
+        <div className="mt-1.5 pl-6 pr-2 text-xs text-[var(--text-secondary)] leading-relaxed border-l-2 border-[var(--border-subtle)] ml-2">
           {occurrence.description}
         </div>
       )}

@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { ShieldAlert, CheckCircle2, XCircle } from 'lucide-react';
-import { DaySummary } from '@/lib/engine/types';
-import { Modal } from '@/components/ui/Modal';
-import { ProgressBar } from '@/components/ui/ProgressBar';
-import { formatFullDate } from '@/lib/engine/dateUtils';
-import { TaskRow } from '@/components/task-rail/TaskRow';
+import React from "react";
+import { ShieldAlert, CheckCircle2, XCircle } from "lucide-react";
+import { DaySummary } from "@/lib/engine/types";
+import { Modal } from "@/components/ui/Modal";
+import { ProgressBar } from "@/components/ui/ProgressBar";
+import { formatFullDate } from "@/lib/engine/dateUtils";
+import { TaskRow } from "@/components/task-rail/TaskRow";
 
 export interface PastDayModalProps {
   daySummary: DaySummary | null;
@@ -16,8 +16,12 @@ export interface PastDayModalProps {
 export function PastDayModal({ daySummary, onClose }: PastDayModalProps) {
   if (!daySummary) return null;
 
-  const completedOccurrences = daySummary.occurrences.filter((o) => o.status === 'completed');
-  const missedOccurrences = daySummary.occurrences.filter((o) => o.status !== 'completed');
+  const completedOccurrences = daySummary.occurrences.filter(
+    (o) => o.status === "completed",
+  );
+  const missedOccurrences = daySummary.occurrences.filter(
+    (o) => o.status !== "completed",
+  );
 
   return (
     <Modal
@@ -32,7 +36,9 @@ export function PastDayModal({ daySummary, onClose }: PastDayModalProps) {
         <div className="flex items-center gap-2 px-3 py-2 bg-[#222630] border border-[#2A2E37] rounded-[3px] text-xs text-[#8B92A3]">
           <ShieldAlert size={14} className="text-[#8B92A3] shrink-0" />
           <span>
-            <strong>Read-only history:</strong> Historical occurrences are locked to preserve an accurate record of completion and roll-forward history.
+            <strong>Read-only history:</strong> Historical occurrences are
+            locked to preserve an accurate record of completion and roll-forward
+            history.
           </span>
         </div>
 
@@ -41,7 +47,8 @@ export function PastDayModal({ daySummary, onClose }: PastDayModalProps) {
           <div className="flex items-center justify-between text-xs">
             <span className="text-[#8B92A3]">Completion Score:</span>
             <span className="font-semibold tabular-nums text-[#E4E6EB]">
-              {daySummary.completedCount} / {daySummary.totalCount} completed ({daySummary.completionPercentage}%)
+              {daySummary.completedCount} / {daySummary.totalCount} completed (
+              {daySummary.completionPercentage}%)
             </span>
           </div>
           <ProgressBar
@@ -52,16 +59,18 @@ export function PastDayModal({ daySummary, onClose }: PastDayModalProps) {
         </div>
 
         {/* Section 1: Completed Occurrences */}
-        <div className="flex flex-col border border-[#2A2E37] rounded-[3px] overflow-hidden bg-[#1C1F26]">
-          <div className="flex items-center justify-between px-3 py-2 bg-[#222630]/70 border-b border-[#2A2E37]">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-[#3DD68C]">
+        <div className="flex flex-col border border-[#2A2E37] rounded-[3px] overflow-hidden bg-[var(--bg-surface)]">
+          <div className="flex items-center justify-between px-3 py-2 bg-[var(--bg-surface-subtle)] border-b border-[#2A2E37]">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-[#003900]">
               <CheckCircle2 size={13} />
               <span>Completed ({completedOccurrences.length})</span>
             </div>
           </div>
           <div className="flex flex-col divide-y divide-[#2A2E37]/40">
             {completedOccurrences.length === 0 ? (
-              <div className="py-3 px-4 text-xs text-[#8B92A3] italic">No tasks completed on this day.</div>
+              <div className="py-3 px-4 text-xs text-[#8B92A3] italic">
+                No tasks completed on this day.
+              </div>
             ) : (
               completedOccurrences.map((occ) => (
                 <TaskRow
@@ -77,16 +86,18 @@ export function PastDayModal({ daySummary, onClose }: PastDayModalProps) {
         </div>
 
         {/* Section 2: Missed / Uncompleted Occurrences */}
-        <div className="flex flex-col border border-[#2A2E37] rounded-[3px] overflow-hidden bg-[#1C1F26]">
-          <div className="flex items-center justify-between px-3 py-2 bg-[#222630]/70 border-b border-[#2A2E37]">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E8B339]">
+        <div className="flex flex-col border border-[#2A2E37] rounded-[3px] overflow-hidden bg-[var(--bg-surface)]">
+          <div className="flex items-center justify-between px-3 py-2 bg-[var(--bg-surface-subtle)] border-b border-[#2A2E37]">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--status-pending)]">
               <XCircle size={13} />
               <span>Missed / Pending ({missedOccurrences.length})</span>
             </div>
           </div>
           <div className="flex flex-col divide-y divide-[#2A2E37]/40">
             {missedOccurrences.length === 0 ? (
-              <div className="py-3 px-4 text-xs text-[#3DD68C] italic">100% completed — no missed tasks!</div>
+              <div className="py-3 px-4 text-xs text-[var(--text-green)] italic">
+                100% completed — no missed tasks!
+              </div>
             ) : (
               missedOccurrences.map((occ) => (
                 <TaskRow

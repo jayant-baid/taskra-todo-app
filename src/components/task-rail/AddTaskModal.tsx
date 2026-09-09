@@ -134,17 +134,21 @@ export function AddTaskModal({
         </div>
 
         {/* Recurring Toggle Switch */}
-        <div className="flex items-center justify-between p-3 bg-[#14161A] border border-[#2A2E37] rounded-[3px]">
+        <div className="flex items-center justify-between p-3 bg-[var(--bg-app)] border border-[var(--border-subtle)] rounded-[6px]">
           <div className="flex items-center gap-2">
             <Repeat
               size={15}
-              className={isRecurring ? "text-[#5B7FFF]" : "text-[#8B92A3]"}
+              className={
+                isRecurring
+                  ? "text-[var(--accent-primary)]"
+                  : "text-[var(--text-secondary)]"
+              }
             />
             <div>
-              <div className="text-xs font-medium text-[#E4E6EB]">
+              <div className="text-xs font-medium text-[var(--text-primary)]">
                 Recurring Task
               </div>
-              <div className="text-[11px] text-[#8B92A3]">
+              <div className="text-[11px] text-[var(--text-secondary)]">
                 {isRecurring
                   ? "Runs indefinitely from start date. Each day has its own independent status."
                   : "Carries forward each day automatically until completed."}
@@ -172,7 +176,7 @@ export function AddTaskModal({
 
         {/* Recurrence Options if Recurring is enabled */}
         {isRecurring && (
-          <div className="flex flex-col gap-3 p-3 bg-[#14161A]/60 border border-[#2A2E37] rounded-[3px] animate-in fade-in duration-100">
+          <div className="flex flex-col gap-3 p-3 bg-[var(--bg-surface-subtle)] border border-[var(--border-subtle)] rounded-[6px] animate-in fade-in duration-100">
             <div className="grid grid-cols-2 gap-3">
               {/* Frequency */}
               <div className="flex flex-col gap-1.5">
@@ -209,7 +213,7 @@ export function AddTaskModal({
                   <PopoverTrigger asChild>
                     <button
                       type="button"
-                      className="flex h-9 w-full items-center justify-between gap-2 rounded-[3px] border border-[#2A2E37] bg-[#1C1F26] px-2.5 text-left text-xs text-[#E4E6EB] transition-colors hover:border-[#5B7FFF] focus:outline-none focus:ring-1 focus:ring-[#5B7FFF]/30"
+                      className="flex h-9 w-full items-center justify-between gap-2 rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-2.5 text-left text-xs text-[var(--text-primary)] transition-colors hover:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]/30"
                       aria-label="Choose task start date"
                     >
                       <span>
@@ -217,7 +221,7 @@ export function AddTaskModal({
                       </span>
                       <CalendarDays
                         size={14}
-                        className="shrink-0 text-[#5B7FFF]"
+                        className="shrink-0 text-[var(--accent-primary)]"
                       />
                     </button>
                   </PopoverTrigger>

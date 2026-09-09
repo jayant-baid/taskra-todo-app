@@ -18,54 +18,63 @@ export function ProgressSummaryCards({
   bestStreak,
 }: ProgressSummaryCardsProps) {
   return (
-    <div className="grid grid-cols-2 gap-3 border-b border-[#2A2E37] pb-1 sm:grid-cols-4">
-      <div className="rounded-[4px] border border-[#2A2E37] border-t-[#FF6B6B] bg-[#1C1F26] p-3">
-        <div className="flex items-center justify-between text-[9px] uppercase tracking-wider text-[#8B92A3]">
+    <div className="grid grid-cols-2 gap-3 border-b border-[var(--border-subtle)] pb-1 sm:grid-cols-4">
+      <div className="rounded-[6px] border border-[var(--border-subtle)] border-t-[var(--status-danger)] bg-[var(--bg-surface)] p-3 shadow-[0_1px_0_rgba(15,23,42,0.02)]">
+        <div className="flex items-center justify-between text-[9px] uppercase tracking-wider text-[var(--text-secondary)]">
           <span className="text-[10px]">Daily Streak</span>
           <Flame
             size={13}
-            className={currentStreak > 0 ? "text-[#FF6B6B]" : "text-[#5C6272]"}
+            className={
+              currentStreak > 0
+                ? "text-[var(--status-danger)]"
+                : "text-[var(--text-muted)]"
+            }
           />
         </div>
-        <p className="mt-1 text-2xl font-bold tabular-nums text-[#E4E6EB]">
-          {currentStreak} <span className="text-xs text-[#8B92A3]">days</span>
+        <p className="text-2xl font-bold tabular-nums text-[var(--text-primary)]">
+          {currentStreak}{" "}
+          <span className="text-xs text-[var(--text-secondary)]">days</span>
         </p>
-        <p className="mt-0.5 text-[10px] text-[#5C6272]">
+        <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
           Best streak: {bestStreak}d
         </p>
       </div>
 
-      <div className="rounded-[4px] border border-[#2A2E37] border-t-[#E8B339] bg-[#1C1F26] p-3">
-        <div className="flex items-center justify-between text-[9px] uppercase tracking-wider text-[#8B92A3]">
+      <div className="rounded-[6px] border border-[var(--border-subtle)] border-t-[var(--status-pending)] bg-[var(--bg-surface)] p-3 shadow-[0_1px_0_rgba(15,23,42,0.02)]">
+        <div className="flex items-center justify-between text-[9px] uppercase tracking-wider text-[var(--text-secondary)]">
           <span className="text-[10px]">Completion</span>
-          <CheckCircle2 size={13} className="text-[#E8B339]" />
+          <CheckCircle2 size={13} className="text-[var(--status-pending)]" />
         </div>
-        <p className="mt-1 text-2xl font-bold tabular-nums text-[#E8B339]">
+        <p className="text-2xl font-bold tabular-nums text-[var(--status-pending)]">
           {completionRate}%
         </p>
-        <p className="mt-0.5 text-[10px] text-[#5C6272]">{periodLabel} tasks</p>
+        <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
+          {periodLabel} tasks
+        </p>
       </div>
 
-      <div className="rounded-[4px] border border-[#2A2E37] border-t-[#3DD68C] bg-[#1C1F26] p-3">
-        <div className="flex items-center justify-between text-[9px] uppercase tracking-wider text-[#8B92A3]">
+      <div className="rounded-[6px] border border-[var(--border-subtle)] border-t-[var(--status-completed)] bg-[var(--bg-surface)] p-3 shadow-[0_1px_0_rgba(15,23,42,0.02)]">
+        <div className="flex items-center justify-between text-[9px] uppercase tracking-wider text-[var(--text-secondary)]">
           <span className="text-[10px]">Perfect days</span>
-          <Sparkles size={13} className="text-[#3DD68C]" />
+          <Sparkles size={13} className="text-[var(--status-completed)]" />
         </div>
-        <p className="mt-1 text-2xl font-bold tabular-nums text-[#3DD68C]">
+        <p className="text-2xl font-bold tabular-nums text-[var(--status-completed)]">
           {perfectDays}
         </p>
-        <p className="mt-0.5 text-[10px] text-[#5C6272]">100% complete</p>
+        <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
+          100% complete
+        </p>
       </div>
 
-      <div className="rounded-[4px] border border-[#2A2E37] border-t-[#5B7FFF] bg-[#1C1F26] p-3">
-        <div className="flex items-center justify-between text-[9px] uppercase tracking-wider text-[#8B92A3]">
+      <div className="rounded-[6px] border border-[var(--border-subtle)] border-t-[var(--accent-primary)] bg-[var(--bg-surface)] p-3 shadow-[0_1px_0_rgba(15,23,42,0.02)]">
+        <div className="flex items-center justify-between text-[9px] uppercase tracking-wider text-[var(--text-secondary)]">
           <span className="text-[10px]">Completed</span>
-          <CheckCircle2 size={13} className="text-[#5B7FFF]" />
+          <CheckCircle2 size={13} className="text-[var(--accent-primary)]" />
         </div>
-        <p className="mt-1 text-2xl font-bold tabular-nums text-[#E4E6EB]">
+        <p className="text-2xl font-bold tabular-nums text-[var(--text-primary)]">
           {completedTasks}
         </p>
-        <p className="mt-0.5 text-[10px] text-[#5C6272]">
+        <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
           total tasks finished
         </p>
       </div>

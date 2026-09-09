@@ -242,7 +242,10 @@ export function AuthModal({
 
         {/* Sync Guarantee Badge */}
         <div className="flex items-center gap-2 px-3 py-2 bg-[#222630]/60 border border-[#2A2E37] rounded-[3px] text-[11px] text-[#8B92A3]">
-          <ShieldCheck size={14} className="text-[#3DD68C] shrink-0" />
+          <ShieldCheck
+            size={14}
+            className="text-[var(--text-green)] shrink-0"
+          />
           <span>
             {mode === "login"
               ? "Signing in will sync your routines and history across all devices."

@@ -34,11 +34,11 @@ export function TaskRail({
       {/* Rail Top Action Bar */}
       <div className="flex items-center justify-between pb-4 pt-1">
         <div className="flex flex-col">
-          <h2 className="text-base font-semibold text-[#E4E6EB] tracking-tight">
+          <h2 className="text-base font-semibold text-[var(--text-primary)] tracking-tight">
             Daily Tasks
           </h2>
-          <span className="text-xs text-[#8B92A3]">
-            {formatDisplayDate(todayStr)} &middot; Local device timezone
+          <span className="text-xs text-[var(--text-secondary)]">
+            {formatDisplayDate(todayStr)}
           </span>
         </div>
         <Button
@@ -55,7 +55,7 @@ export function TaskRail({
 
       {/* Carry-over notice if any */}
       {carryOverCount > 0 && (
-        <div className="mb-3.5 flex items-center gap-2 p-2.5 bg-[rgba(232,179,57,0.08)] border border-[rgba(232,179,57,0.25)] rounded-[3px] text-xs text-[#E8B339]">
+        <div className="mb-3.5 flex items-center gap-2 p-2.5 bg-[rgba(232,179,57,0.08)] border border-[rgba(232,179,57,0.25)] rounded-[3px] text-xs text-[var(--status-pending)]">
           <AlertCircle size={14} className="shrink-0" />
           <span>
             <strong>

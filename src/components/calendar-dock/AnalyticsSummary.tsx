@@ -28,7 +28,7 @@ export function AnalyticsSummary({ analytics }: AnalyticsSummaryProps) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
-        <TrendingUp size={16} className="text-[#3DD68C]" />
+        <TrendingUp size={16} className="text-[var(--text-green)]" />
         <h3 className="text-sm font-semibold text-[#E4E6EB] tracking-tight">
           Performance Analytics
         </h3>
@@ -42,7 +42,9 @@ export function AnalyticsSummary({ analytics }: AnalyticsSummaryProps) {
             <Flame
               size={14}
               className={
-                currentStreak > 0 ? "text-[#E8B339]" : "text-[#5C6272]"
+                currentStreak > 0
+                  ? "text-[var(--status-pending)]"
+                  : "text-[#5C6272]"
               }
             />
           </div>
@@ -61,10 +63,10 @@ export function AnalyticsSummary({ analytics }: AnalyticsSummaryProps) {
         <div className="p-3 bg-[#1C1F26] border border-[#2A2E37] rounded-[3px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-[#8B92A3] mb-1">
             <span className="text-[11px] font-medium">7-Day Rate</span>
-            <CheckCircle size={14} className="text-[#3DD68C]" />
+            <CheckCircle size={14} className="text-[var(--text-green)]" />
           </div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-xl font-bold text-[#3DD68C] tabular-nums tracking-tight">
+            <span className="text-xl font-bold text-[var(--text-green)] tabular-nums tracking-tight">
               {completionRate7d}%
             </span>
             <span className="text-xs text-[#8B92A3]">completed</span>
@@ -98,14 +100,18 @@ export function AnalyticsSummary({ analytics }: AnalyticsSummaryProps) {
             <Layers
               size={14}
               className={
-                carryOverCount > 0 ? "text-[#E8B339]" : "text-[#5C6272]"
+                carryOverCount > 0
+                  ? "text-[var(--status-pending)]"
+                  : "text-[#5C6272]"
               }
             />
           </div>
           <div className="flex items-baseline gap-1.5">
             <span
               className={`text-xl font-bold tabular-nums tracking-tight ${
-                carryOverCount > 0 ? "text-[#E8B339]" : "text-[#E4E6EB]"
+                carryOverCount > 0
+                  ? "text-[var(--status-pending)]"
+                  : "text-[#E4E6EB]"
               }`}
             >
               {carryOverCount}

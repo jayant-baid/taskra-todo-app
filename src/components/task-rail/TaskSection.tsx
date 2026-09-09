@@ -30,15 +30,17 @@ export function TaskSection({
   const totalCount = occurrences.length;
 
   return (
-    <div className="flex flex-col border border-[#2A2E37] bg-[#1C1F26] rounded-[3px] overflow-hidden">
+    <div className="flex flex-col border border-[var(--border-subtle)] bg-[var(--bg-surface)] rounded-[6px] overflow-hidden shadow-[0_1px_0_rgba(15,23,42,0.02)]">
       {/* Section Header */}
-      <div className="flex items-center justify-between px-3.5 py-2.5 bg-[#222630]/60 border-b border-[#2A2E37]">
+      <div className="flex items-center justify-between px-3.5 py-2.5 bg-[var(--bg-surface-subtle)] border-b border-[var(--border-subtle)]">
         <div className="flex items-center gap-2">
-          <span className="text-[13px] font-semibold text-[#E4E6EB] tracking-tight">
+          <span className="text-[13px] font-semibold text-[var(--text-primary)] tracking-tight">
             {title}
           </span>
           {subtitle && (
-            <span className="text-[11px] text-[#8B92A3]">({subtitle})</span>
+            <span className="text-[11px] text-[var(--text-secondary)]">
+              ({subtitle})
+            </span>
           )}
         </div>
         <div className="flex items-center gap-1.5">
@@ -55,9 +57,9 @@ export function TaskSection({
       </div>
 
       {/* Task List */}
-      <div className="flex flex-col divide-y divide-[#2A2E37]/40">
+      <div className="flex flex-col divide-y divide-[var(--border-subtle)]/80">
         {occurrences.length === 0 ? (
-          <div className="py-6 px-4 text-center text-xs text-[#8B92A3] italic">
+          <div className="py-6 px-4 text-center text-xs text-[var(--text-secondary)] italic">
             {emptyText}
           </div>
         ) : (

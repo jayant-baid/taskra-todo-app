@@ -15,14 +15,14 @@ export const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-9 w-full items-center justify-between rounded-[3px] border border-[#2A2E37] bg-[#1C1F26] px-2.5 text-xs text-[#E4E6EB] outline-none transition-colors hover:border-[#383E4C] focus:border-[#5B7FFF] focus:ring-1 focus:ring-[#5B7FFF]/30",
+      "flex h-9 w-full items-center justify-between rounded-[6px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-2.5 text-xs text-[var(--text-primary)] shadow-[0_1px_0_rgba(15,23,42,0.02)] outline-none transition-all duration-150 hover:border-[var(--border-strong)] hover:bg-[var(--bg-surface-subtle)] focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-primary)]/20 data-[placeholder]:text-[var(--text-secondary)]",
       className,
     )}
     {...props}
   >
     {children}
     <SelectPrimitive.Icon>
-      <ChevronDown size={14} className="text-[#8B92A3]" />
+      <ChevronDown size={14} className="text-[var(--text-secondary)]" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ));
@@ -38,9 +38,10 @@ export const SelectContent = React.forwardRef<
       ref={ref}
       position={position}
       className={cn(
-        "z-[100] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-[4px] border border-[#383E4C] bg-[#1C1F26] p-1 text-[#E4E6EB] shadow-2xl",
+        "z-[100] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-1 text-[var(--text-primary)] shadow-[0_20px_45px_rgba(15,23,42,0.18)]",
         className,
       )}
+      sideOffset={6}
       {...props}
     >
       <SelectPrimitive.Viewport>{children}</SelectPrimitive.Viewport>
@@ -57,17 +58,19 @@ export const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-pointer select-none items-center rounded-[3px] py-1.5 pl-7 pr-2 text-xs outline-none focus:bg-[#222630] data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex cursor-pointer select-none items-center rounded-[5px] py-1.5 pl-7 pr-2 text-xs text-[var(--text-primary)] outline-none transition-colors hover:bg-[var(--bg-surface-subtle)] focus:bg-[var(--bg-surface-subtle)] data-[highlighted]:bg-[var(--bg-surface-subtle)] data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className,
     )}
     {...props}
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
-        <Check size={13} className="text-[#5B7FFF]" />
+        <Check size={13} className="text-[var(--accent-primary)]" />
       </SelectPrimitive.ItemIndicator>
     </span>
-    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+    <SelectPrimitive.ItemText className="text-[var(--text-primary)]">
+      {children}
+    </SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 ));
 

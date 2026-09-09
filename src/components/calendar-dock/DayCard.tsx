@@ -80,11 +80,11 @@ export function DayCard({ summary, onSelectDay }: DayCardProps) {
               "font-medium",
               totalCount > 0 &&
                 completionPercentage === 100 &&
-                "text-[#3DD68C]",
+                "text-[var(--text-green)]",
               totalCount > 0 &&
                 completionPercentage > 0 &&
                 completionPercentage < 100 &&
-                "text-[#E8B339]",
+                "text-[var(--status-pending)]",
             )}
           >
             {totalCount > 0 ? `${completionPercentage}%` : "—"}

@@ -10,6 +10,8 @@ import {
   CloudCheck,
   CheckSquare,
   BarChart2,
+  SunMedium,
+  MoonStar,
 } from "lucide-react";
 import { useTasks } from "@/lib/hooks/useTasks";
 import { useAuthInternal } from "@/lib/hooks/useAuth";
@@ -19,7 +21,6 @@ import { AddTaskModal } from "@/components/task-rail/AddTaskModal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { Button } from "@/components/ui/Button";
-import { ResizableDivider } from "@/components/ui/ResizableDivider";
 
 export default function Home() {
   const {
@@ -67,17 +68,26 @@ export default function Home() {
   const [isRemoving, setIsRemoving] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [mobileTab, setMobileTab] = useState<"tasks" | "analytics">("tasks");
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    if (typeof window === "undefined") return "dark";
 
-  const [leftWidth, setLeftWidth] = useState(460);
-  const [isDragging, setIsDragging] = useState(false);
+    const savedTheme = window.localStorage.getItem("taskra-theme");
+    if (savedTheme === "light" || savedTheme === "dark") {
+      return savedTheme;
+    }
 
-  const handleResize = (clientX: number) => {
-    const minWidth = 400;
-    const maxWidth = 700;
+    return window.matchMedia("(prefers-color-scheme: light)").matches
+      ? "light"
+      : "dark";
+  });
 
-    const newWidth = Math.min(maxWidth, Math.max(minWidth, clientX));
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("taskra-theme", theme);
+  }, [theme]);
 
-    setLeftWidth(newWidth);
+  const toggleTheme = () => {
+    setTheme((current) => (current === "dark" ? "light" : "dark"));
   };
 
   // Open Auth Modal if OAuth returned an error
@@ -137,9 +147,9 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-full w-full overflow-hidden bg-[#14161A] text-[#E4E6EB]">
+    <div className="flex flex-col h-full w-full overflow-hidden bg-[var(--bg-app)] text-[var(--text-primary)]">
       {/* Top Cockpit Header */}
-      <header className="h-12 border-b border-[#2A2E37] bg-[#1C1F26] px-3 sm:px-5 flex items-center justify-between shrink-0 select-none">
+      <header className="h-12 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 sm:px-5 flex items-center justify-between shrink-0 select-none shadow-[0_1px_0_rgba(15,23,42,0.02)]">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <Image
@@ -149,12 +159,14 @@ export default function Home() {
               height={26}
               className="rounded-lg"
             />
-            <h1 className="text-sm font-semibold tracking-tight text-[#E4E6EB]">
+            <h1 className="text-sm font-semibold tracking-tight text-[var(--text-primary)]">
               Taskra
             </h1>
           </div>
-          <span className="text-[#383E4C] hidden sm:inline">|</span>
-          <span className="text-xs text-[#8B92A3] hidden lg:inline-block">
+          <span className="text-[var(--border-strong)] hidden sm:inline">
+            |
+          </span>
+          <span className="text-xs text-[var(--text-secondary)] hidden lg:inline-block">
             Plan. Focus. Complete.
           </span>
         </div>
@@ -162,6 +174,20 @@ export default function Home() {
         {/* System, Auth, and Action Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Remove All Data Button (triggers confirmation popup) */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-[3px] cursor-pointer border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]"
+            aria-label="Toggle theme"
+            title="Toggle theme"
+          >
+            {theme === "dark" ? (
+              <SunMedium size={14} />
+            ) : (
+              <MoonStar size={14} />
+            )}
+          </button>
+
           <Button
             variant="ghost"
             size="sm"
@@ -193,7 +219,7 @@ export default function Home() {
               {user ? (
                 <div className="flex items-center gap-1.5 bg-[#14161A] px-2 sm:px-2.5 py-1 rounded-[2px] border border-[#2A2E37] text-xs">
                   <span
-                    className="flex items-center gap-1 text-[#3DD68C]"
+                    className="flex items-center gap-1 text-[var(--text-green)]"
                     title="Synced with server database"
                   >
                     <CloudCheck size={13} />
@@ -264,7 +290,7 @@ export default function Home() {
       <main className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
         {/* Left Rail: Task List (Today & Tomorrow) */}
         <section
-          className={`w-full md:w-[460px] lg:w-[500px] shrink-0 border-b md:border-b-0 md:border-r border-[#2A2E37] bg-[#14161A] p-4 flex-col min-h-0 ${
+          className={`w-full md:w-[460px] lg:w-[500px] shrink-0 border-b md:border-b-0 md:border-r border-[var(--border-subtle)] bg-[var(--bg-app)] p-4 flex-col min-h-0 ${
             mobileTab === "tasks" ? "flex flex-1" : "hidden md:flex"
           }`}
         >
@@ -301,7 +327,7 @@ export default function Home() {
 
         {/* Right Dock: Calendar & Performance Analytics */}
         <section
-          className={`flex-1 bg-[#14161A] p-4 sm:p-5 flex-col min-h-0 overflow-y-auto ${
+          className={`flex-1 bg-[var(--bg-app)] p-4 sm:p-5 flex-col min-h-0 overflow-y-auto ${
             mobileTab === "analytics" ? "flex flex-1" : "hidden md:flex"
           }`}
         >
