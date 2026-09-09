@@ -338,6 +338,16 @@ export function useTasks() {
     );
   }, [activeWeekCenterDate, taskDefinitions, taskOccurrences, todayStr]);
 
+  // Derived: Monthly progress grid for the calendar dock
+  const monthlyData = useMemo(() => {
+    return computeMonthlyData(
+      activeMonthStr,
+      taskDefinitions,
+      taskOccurrences,
+      todayStr,
+    );
+  }, [activeMonthStr, taskDefinitions, taskOccurrences, todayStr]);
+
   // Derived: Overall Analytics metrics
   const analytics = useMemo(() => {
     return computeAnalytics(taskDefinitions, taskOccurrences, todayStr);
@@ -369,6 +379,26 @@ export function useTasks() {
     setActiveWeekCenterDate(todayStr);
   }, [todayStr]);
 
+  const goToPreviousMonth = useCallback(() => {
+    setActiveMonthStr((previous) => {
+      const [year, month] = previous.split("-").map(Number);
+      const date = new Date(year, month - 2, 1);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    });
+  }, []);
+
+  const goToNextMonth = useCallback(() => {
+    setActiveMonthStr((previous) => {
+      const [year, month] = previous.split("-").map(Number);
+      const date = new Date(year, month, 1);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    });
+  }, []);
+
+  const goToCurrentMonth = useCallback(() => {
+    setActiveMonthStr(todayStr.slice(0, 7));
+  }, [todayStr]);
+
   return {
     todayStr,
     tomorrowStr,
@@ -376,6 +406,8 @@ export function useTasks() {
     todayOccurrences,
     tomorrowOccurrences,
     weekSummaries,
+    activeMonthStr,
+    monthlyData,
     analytics,
     isLoading,
     addTask,
@@ -390,5 +422,8 @@ export function useTasks() {
     goToPreviousWeek,
     goToNextWeek,
     goToCurrentWeek,
+    goToPreviousMonth,
+    goToNextMonth,
+    goToCurrentMonth,
   };
 }

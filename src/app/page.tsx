@@ -28,6 +28,8 @@ export default function Home() {
     todayOccurrences,
     tomorrowOccurrences,
     weekSummaries,
+    activeMonthStr,
+    monthlyData,
     analytics,
     isLoading: isTasksLoading,
     addTask,
@@ -40,6 +42,9 @@ export default function Home() {
     goToPreviousWeek,
     goToNextWeek,
     goToCurrentWeek,
+    goToPreviousMonth,
+    goToNextMonth,
+    goToCurrentMonth,
   } = useTasks();
 
   const {
@@ -295,9 +300,14 @@ export default function Home() {
           <CalendarDock
             weekSummaries={weekSummaries}
             analytics={analytics}
+            activeMonthStr={activeMonthStr}
+            monthlyData={monthlyData}
             onPrevWeek={goToPreviousWeek}
             onNextWeek={goToNextWeek}
             onCurrentWeek={goToCurrentWeek}
+            onPrevMonth={goToPreviousMonth}
+            onNextMonth={goToNextMonth}
+            onCurrentMonth={goToCurrentMonth}
             onSelectToday={() => {
               goToCurrentWeek();
               setMobileTab("tasks");
