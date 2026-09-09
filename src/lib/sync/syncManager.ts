@@ -31,13 +31,15 @@ export async function pullServerState(): Promise<{
   if (typeof window === "undefined") return { success: false, updated: false };
 
   const token = getClientToken();
-  if (!token) {
-    return { success: false, updated: false };
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
   }
 
   try {
     const res = await fetch("/api/sync", {
-      headers: { Authorization: `Bearer ${token}` },
+      headers,
+      credentials: "include",
     });
 
     if (!res.ok) {
@@ -80,10 +82,6 @@ export async function flushSyncQueue(): Promise<{
   }
 
   const token = getClientToken();
-  if (!token) {
-    // If not logged in, queue remains local until user logs in
-    return { syncedCount: 0, success: true };
-  }
 
   try {
     isSyncing = true;
@@ -94,12 +92,15 @@ export async function flushSyncQueue(): Promise<{
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     };
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
 
     const res = await fetch("/api/sync", {
       method: "POST",
       headers,
+      credentials: "include",
       body: JSON.stringify({ items }),
     });
 

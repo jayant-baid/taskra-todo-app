@@ -60,7 +60,10 @@ export function useAuthInternal() {
           headers["Authorization"] = `Bearer ${storedToken}`;
         }
 
-        const res = await fetch("/api/auth/me", { headers });
+        const res = await fetch("/api/auth/me", {
+          headers,
+          credentials: "include",
+        });
         if (!isMounted) return;
 
         if (res.ok) {
@@ -104,6 +107,7 @@ export function useAuthInternal() {
       setToken(data.token);
       void fetch("/api/auth/me", {
         headers: { Authorization: `Bearer ${data.token}` },
+        credentials: "include",
       })
         .then((res) => (res.ok ? res.json() : null))
         .then((result) => {
@@ -127,6 +131,7 @@ export function useAuthInternal() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ username, password }),
       });
 
@@ -152,6 +157,7 @@ export function useAuthInternal() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ username, password }),
       });
 
@@ -179,7 +185,11 @@ export function useAuthInternal() {
       if (storedToken) {
         headers["Authorization"] = `Bearer ${storedToken}`;
       }
-      await fetch("/api/auth/logout", { method: "POST", headers });
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        headers,
+        credentials: "include",
+      });
     } catch (err) {
       console.warn("[useAuth] Logout network error:", err);
     } finally {
