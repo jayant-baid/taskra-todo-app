@@ -190,13 +190,14 @@ export function findOrCreateOAuthUser(profile: OAuthProfile): {
   if (existingProviderUser) {
     user = existingProviderUser;
   } else if (profile.email) {
+    const normalizedEmail = profile.email.trim().toLowerCase();
     // 2. Try to find user by email to link accounts
     const findByEmailStmt = db.prepare(`
       SELECT id, username, created_at
       FROM users
-      WHERE email = ?
+      WHERE LOWER(email) = ?
     `);
-    const existingEmailUser = findByEmailStmt.get(profile.email) as
+    const existingEmailUser = findByEmailStmt.get(normalizedEmail) as
       | { id: string; username: string; created_at: string }
       | undefined;
 
@@ -225,9 +226,15 @@ export function findOrCreateOAuthUser(profile: OAuthProfile): {
         .toLowerCase()
         .replace(/[^a-z0-9_]/g, "")
         .substring(0, 15) || "user";
-    // const uniqueSuffix = Math.random().toString(36).substring(2, 6);
-    // const username = `${cleanBaseName}_${uniqueSuffix}`;
-    const username = `${cleanBaseName}`;
+    let username = cleanBaseName;
+    let usernameSuffix = 2;
+    const usernameExistsStmt = db.prepare(
+      "SELECT 1 FROM users WHERE username = ? COLLATE NOCASE LIMIT 1",
+    );
+    while (usernameExistsStmt.get(username)) {
+      username = `${cleanBaseName}_${usernameSuffix}`;
+      usernameSuffix += 1;
+    }
     const createdAt = new Date().toISOString();
 
     const insertStmt = db.prepare(`
@@ -239,7 +246,7 @@ export function findOrCreateOAuthUser(profile: OAuthProfile): {
     insertStmt.run(
       userId,
       username,
-      profile.email || null,
+      profile.email?.trim().toLowerCase() || null,
       randomOAuthSecret,
       randomOAuthSalt,
       profile.provider,
