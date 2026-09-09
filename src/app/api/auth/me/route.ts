@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { getAuthUser } from '@/lib/server/auth';
+import { NextResponse } from "next/server";
+import { getAuthUser } from "@/lib/server/auth";
 
 export async function GET(request: Request) {
   try {
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
       },
     });
   } catch (err: unknown) {
-    console.error('Auth check error:', err);
+    console.error("Auth check error:", err);
     return NextResponse.json({ success: true, user: null });
   }
 }

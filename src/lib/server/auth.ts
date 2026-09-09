@@ -58,7 +58,12 @@ export function getUserFromToken(token: string): UserRecord | null {
   `);
 
   const row = stmt.get(token, nowIso) as
-    | { id: string; username: string; role: "user" | "admin"; created_at: string }
+    | {
+        id: string;
+        username: string;
+        role: "user" | "admin";
+        created_at: string;
+      }
     | undefined;
   if (!row) return null;
 

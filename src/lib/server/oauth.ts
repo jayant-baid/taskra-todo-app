@@ -185,7 +185,14 @@ export function findOrCreateOAuthUser(profile: OAuthProfile): {
   const existingProviderUser = findByProviderStmt.get(
     profile.provider,
     profile.providerId,
-  ) as { id: string; username: string; role: "user" | "admin"; created_at: string } | undefined;
+  ) as
+    | {
+        id: string;
+        username: string;
+        role: "user" | "admin";
+        created_at: string;
+      }
+    | undefined;
 
   if (existingProviderUser) {
     user = existingProviderUser;
@@ -198,7 +205,12 @@ export function findOrCreateOAuthUser(profile: OAuthProfile): {
       WHERE LOWER(email) = ?
     `);
     const existingEmailUser = findByEmailStmt.get(normalizedEmail) as
-      | { id: string; username: string; role: "user" | "admin"; created_at: string }
+      | {
+          id: string;
+          username: string;
+          role: "user" | "admin";
+          created_at: string;
+        }
       | undefined;
 
     if (existingEmailUser) {

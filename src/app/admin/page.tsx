@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, BarChart3, CheckCircle2, CircleUserRound, ListTodo, ShieldCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  BarChart3,
+  CheckCircle2,
+  CircleUserRound,
+  ListTodo,
+  ShieldCheck,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -52,12 +59,17 @@ export default function AdminPage() {
     fetch("/api/admin/overview", { credentials: "include", cache: "no-store" })
       .then(async (response) => {
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "Admin access required");
+        if (!response.ok)
+          throw new Error(data.error || "Admin access required");
         return data as Overview;
       })
       .then(setOverview)
       .catch((reason: unknown) => {
-        setError(reason instanceof Error ? reason.message : "Unable to load admin data");
+        setError(
+          reason instanceof Error
+            ? reason.message
+            : "Unable to load admin data",
+        );
       });
   }, []);
 
@@ -65,10 +77,16 @@ export default function AdminPage() {
     return (
       <main className="min-h-screen bg-[var(--bg-app)] p-6 text-[var(--text-primary)]">
         <div className="mx-auto max-w-xl rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 text-center">
-          <ShieldCheck className="mx-auto mb-3 text-[var(--status-danger)]" size={30} />
+          <ShieldCheck
+            className="mx-auto mb-3 text-[var(--status-danger)]"
+            size={30}
+          />
           <h1 className="text-lg font-semibold">Admin access required</h1>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">{error}</p>
-          <Link href="/" className="mt-6 inline-flex items-center gap-2 text-sm text-[var(--accent-primary)] hover:underline">
+          <Link
+            href="/"
+            className="mt-6 inline-flex items-center gap-2 text-sm text-[var(--accent-primary)] hover:underline"
+          >
             <ArrowLeft size={15} /> Back to Taskra
           </Link>
         </div>
@@ -77,7 +95,11 @@ export default function AdminPage() {
   }
 
   if (!overview) {
-    return <main className="flex min-h-screen items-center justify-center bg-[var(--bg-app)] text-sm text-[var(--text-secondary)]">Loading admin overview...</main>;
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[var(--bg-app)] text-sm text-[var(--text-secondary)]">
+        Loading admin overview...
+      </main>
+    );
   }
 
   const cards = [
@@ -85,7 +107,11 @@ export default function AdminPage() {
     ["Active sessions", overview.summary.active_sessions, ShieldCheck],
     ["All tasks", overview.summary.total_tasks, ListTodo],
     ["Active recurring", overview.summary.recurring_tasks, BarChart3],
-    ["Completed occurrences", overview.summary.completed_occurrences, CheckCircle2],
+    [
+      "Completed occurrences",
+      overview.summary.completed_occurrences,
+      CheckCircle2,
+    ],
     ["Completion rate", `${overview.summary.completion_rate}%`, BarChart3],
   ] as const;
 
@@ -97,20 +123,32 @@ export default function AdminPage() {
             <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent-primary)]">
               <ShieldCheck size={15} /> Admin console
             </div>
-            <h1 className="text-2xl font-semibold tracking-tight">Taskra usage overview</h1>
-            <p className="mt-1 text-sm text-[var(--text-secondary)]">Users, task activity, and completion analysis.</p>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Taskra usage overview
+            </h1>
+            <p className="mt-1 text-sm text-[var(--text-secondary)]">
+              Users, task activity, and completion analysis.
+            </p>
           </div>
-          <Link href="/" className="inline-flex items-center gap-2 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 py-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 py-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+          >
             <ArrowLeft size={15} /> Taskra
           </Link>
         </header>
 
         <section className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-6">
           {cards.map(([label, value, Icon]) => (
-            <div key={label} className="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4">
+            <div
+              key={label}
+              className="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4"
+            >
               <Icon size={17} className="mb-4 text-[var(--accent-primary)]" />
               <div className="text-2xl font-semibold tabular-nums">{value}</div>
-              <div className="mt-1 text-xs text-[var(--text-secondary)]">{label}</div>
+              <div className="mt-1 text-xs text-[var(--text-secondary)]">
+                {label}
+              </div>
             </div>
           ))}
         </section>
@@ -137,23 +175,46 @@ export default function AdminPage() {
                     className="cursor-pointer border-b border-[var(--border-subtle)] last:border-0 hover:bg-[var(--bg-surface-subtle)]"
                     onClick={() => router.push(`/admin/users/${user.id}`)}
                     onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") router.push(`/admin/users/${user.id}`);
+                      if (event.key === "Enter" || event.key === " ")
+                        router.push(`/admin/users/${user.id}`);
                     }}
                     tabIndex={0}
                     role="button"
                   >
-                    <td className="px-4 py-3"><div className="font-medium">{user.username}{user.role === "admin" && <span className="ml-2 text-[10px] uppercase text-[var(--accent-primary)]">admin</span>}</div><div className="text-xs text-[var(--text-secondary)]">{user.email || "No email"}</div></td>
-                    <td className="px-4 py-3 capitalize text-[var(--text-secondary)]">{user.provider}</td>
-                    <td className="px-4 py-3 tabular-nums">{user.active_task_count} active <span className="text-[var(--text-muted)]">/ {user.task_count} total</span></td>
-                    <td className="px-4 py-3 tabular-nums">{user.completed_count}</td>
-                    <td className="px-4 py-3 text-[var(--text-secondary)]">{formatDate(user.created_at)}</td>
+                    <td className="px-4 py-3">
+                      <div className="font-medium">
+                        {user.username}
+                        {user.role === "admin" && (
+                          <span className="ml-2 text-[10px] uppercase text-[var(--accent-primary)]">
+                            admin
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs text-[var(--text-secondary)]">
+                        {user.email || "No email"}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 capitalize text-[var(--text-secondary)]">
+                      {user.provider}
+                    </td>
+                    <td className="px-4 py-3 tabular-nums">
+                      {user.active_task_count} active{" "}
+                      <span className="text-[var(--text-muted)]">
+                        / {user.task_count} total
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 tabular-nums">
+                      {user.completed_count}
+                    </td>
+                    <td className="px-4 py-3 text-[var(--text-secondary)]">
+                      {formatDate(user.created_at)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </section>
-
       </div>
     </main>
   );

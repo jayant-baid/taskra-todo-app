@@ -8,15 +8,23 @@ import { TaskDefinition, TaskOccurrence } from "@/lib/engine/types";
 export async function GET(request: Request) {
   const user = getAuthUser(request);
   if (!user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { success: false, error: "Unauthorized" },
+      { status: 401 },
+    );
   }
   if (user.role !== "admin") {
-    return NextResponse.json({ success: false, error: "Admin access required" }, { status: 403 });
+    return NextResponse.json(
+      { success: false, error: "Admin access required" },
+      { status: 403 },
+    );
   }
 
   try {
     const db = getDatabase();
-    const summary = db.prepare(`
+    const summary = db
+      .prepare(
+        `
       SELECT
         (SELECT COUNT(*) FROM users) AS total_users,
         (SELECT COUNT(*) FROM users WHERE role = 'admin') AS admin_users,
@@ -26,7 +34,9 @@ export async function GET(request: Request) {
         (SELECT COUNT(*) FROM task_definitions WHERE is_recurring = 1 AND status = 'active') AS recurring_tasks,
         (SELECT COUNT(*) FROM task_occurrences) AS total_occurrences,
         (SELECT COUNT(*) FROM task_occurrences WHERE status = 'completed') AS completed_occurrences
-    `).get() as {
+    `,
+      )
+      .get() as {
       total_users: number;
       admin_users: number;
       active_sessions: number;
@@ -37,7 +47,9 @@ export async function GET(request: Request) {
       completed_occurrences: number;
     };
 
-    const users = db.prepare(`
+    const users = db
+      .prepare(
+        `
       SELECT
         u.id,
         u.username,
@@ -53,7 +65,9 @@ export async function GET(request: Request) {
       LEFT JOIN task_occurrences o ON o.user_id = u.id
       GROUP BY u.id
       ORDER BY u.created_at DESC
-    `).all() as Array<{
+    `,
+      )
+      .all() as Array<{
       id: string;
       username: string;
       email: string | null;
@@ -65,11 +79,15 @@ export async function GET(request: Request) {
       completed_count: number;
     }>;
 
-    const taskRows = db.prepare(`
+    const taskRows = db
+      .prepare(
+        `
       SELECT id, user_id, title, description, is_recurring, recurrence_rule,
         start_date, created_at, deleted_from, status
       FROM task_definitions
-    `).all() as Array<{
+    `,
+      )
+      .all() as Array<{
       id: string;
       user_id: string;
       title: string;
@@ -81,10 +99,14 @@ export async function GET(request: Request) {
       deleted_from: string | null;
       status: string;
     }>;
-    const occurrenceRows = db.prepare(`
+    const occurrenceRows = db
+      .prepare(
+        `
       SELECT id, user_id, task_definition_id, date, status, completed_at, updated_at
       FROM task_occurrences
-    `).all() as Array<{
+    `,
+      )
+      .all() as Array<{
       id: string;
       user_id: string;
       task_definition_id: string;
@@ -94,7 +116,10 @@ export async function GET(request: Request) {
       updated_at: string;
     }>;
     const today = getLocalDateString();
-    const analyticsByUser = new Map<string, ReturnType<typeof computeAnalytics>>();
+    const analyticsByUser = new Map<
+      string,
+      ReturnType<typeof computeAnalytics>
+    >();
     for (const account of users) {
       const definitions: TaskDefinition[] = taskRows
         .filter((task) => task.user_id === account.id)
@@ -119,7 +144,10 @@ export async function GET(request: Request) {
           completedAt: occurrence.completed_at || undefined,
           updatedAt: occurrence.updated_at,
         }));
-      analyticsByUser.set(account.id, computeAnalytics(definitions, occurrences, today));
+      analyticsByUser.set(
+        account.id,
+        computeAnalytics(definitions, occurrences, today),
+      );
     }
 
     const usersWithAnalytics = users.map((account) => ({
@@ -130,17 +158,20 @@ export async function GET(request: Request) {
     const totalOccurrences = Number(summary.total_occurrences);
     const completedOccurrences = Number(summary.completed_occurrences);
 
-    return NextResponse.json({
-      success: true,
-      summary: {
-        ...summary,
-        completion_rate: totalOccurrences
-          ? Math.round((completedOccurrences / totalOccurrences) * 100)
-          : 0,
+    return NextResponse.json(
+      {
+        success: true,
+        summary: {
+          ...summary,
+          completion_rate: totalOccurrences
+            ? Math.round((completedOccurrences / totalOccurrences) * 100)
+            : 0,
+        },
+        users: usersWithAnalytics,
+        generated_at: new Date().toISOString(),
       },
-      users: usersWithAnalytics,
-      generated_at: new Date().toISOString(),
-    }, { headers: { "Cache-Control": "no-store" } });
+      { headers: { "Cache-Control": "no-store" } },
+    );
   } catch (error: unknown) {
     console.error("[Admin overview error]:", error);
     return NextResponse.json(
