@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     const existing = await query("SELECT id FROM users WHERE username = ?", [
       username,
     ]);
-    if (existing) {
+    if (existing.length > 0) {
       return NextResponse.json(
         { success: false, error: "Username is already taken." },
         { status: 409 },

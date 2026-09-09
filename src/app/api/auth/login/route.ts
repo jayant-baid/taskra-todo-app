@@ -18,12 +18,13 @@ export async function POST(request: Request) {
     const users = await query<{
       id: string;
       username: string;
+      role: "user" | "admin";
       password_hash: string;
       salt: string;
       created_at: string;
     }>(
       `
-      SELECT id, username, password_hash, salt, created_at
+      SELECT id, username, role, password_hash, salt, created_at
       FROM users
       WHERE username = ?
     `,
@@ -54,6 +55,7 @@ export async function POST(request: Request) {
       user: {
         id: user.id,
         username: user.username,
+        role: user.role,
         createdAt: user.created_at,
       },
       token,
