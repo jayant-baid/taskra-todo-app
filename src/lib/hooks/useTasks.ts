@@ -72,7 +72,8 @@ export function useTasks() {
     let isMounted = true;
     const initData = async () => {
       try {
-        // First try pulling latest from server (if logged in)
+        // Upload local changes before replacing the local store with server state.
+        await flushSyncQueue();
         await pullServerState();
         if (!isMounted) return;
 

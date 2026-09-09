@@ -40,6 +40,7 @@ export async function pullServerState(): Promise<{
     const res = await fetch("/api/sync", {
       headers,
       credentials: "include",
+      cache: "no-store",
     });
 
     if (!res.ok) {
