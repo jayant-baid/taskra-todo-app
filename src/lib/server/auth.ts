@@ -81,7 +81,19 @@ export function extractTokenFromRequest(request: Request): string | null {
 }
 
 export function getAuthUser(request: Request): UserRecord | null {
-  const token = extractTokenFromRequest(request);
-  if (!token) return null;
-  return getUserFromToken(token);
+  const authHeader = request.headers.get('Authorization') || request.headers.get('authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const bearerUser = getUserFromToken(authHeader.substring(7).trim());
+    if (bearerUser) return bearerUser;
+  }
+
+  const cookieHeader = request.headers.get('cookie') || request.headers.get('Cookie');
+  if (cookieHeader) {
+    const match = cookieHeader.match(/(?:^|;\s*)session_token=([^;]+)/);
+    if (match && match[1]) {
+      return getUserFromToken(decodeURIComponent(match[1]));
+    }
+  }
+
+  return null;
 }
