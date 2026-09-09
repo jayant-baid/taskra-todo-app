@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   if (error || !code) {
     const errorMsg = error || "Authorization code was not returned by Facebook";
     return NextResponse.redirect(
-      `${origin}/?auth_error=${encodeURIComponent(errorMsg)}`,
+      `${origin}/auth/callback?provider=facebook&error=${encodeURIComponent(errorMsg)}`,
     );
   }
 
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     const { token, expiresAt } = findOrCreateOAuthUser(profile);
 
     const redirectResponse = NextResponse.redirect(
-      `${origin}/?auth_success=facebook&token=${encodeURIComponent(token)}`,
+      `${origin}/auth/callback?provider=facebook&token=${encodeURIComponent(token)}`,
     );
 
     redirectResponse.cookies.set("session_token", token, {
@@ -41,7 +41,7 @@ export async function GET(request: Request) {
     const message =
       err instanceof Error ? err.message : "Facebook authentication failed";
     return NextResponse.redirect(
-      `${origin}/?auth_error=${encodeURIComponent(message)}`,
+      `${origin}/auth/callback?provider=facebook&error=${encodeURIComponent(message)}`,
     );
   }
 }

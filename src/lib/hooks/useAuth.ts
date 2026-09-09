@@ -88,6 +88,39 @@ export function useAuthInternal() {
     };
   }, []);
 
+  useEffect(() => {
+    let isMounted = true;
+    const handleOAuthMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+
+      const data = event.data as {
+        type?: string;
+        success?: boolean;
+        token?: string;
+      };
+      if (data.type !== "taskra-oauth" || !data.success || !data.token) return;
+
+      setClientToken(data.token);
+      setToken(data.token);
+      void fetch("/api/auth/me", {
+        headers: { Authorization: `Bearer ${data.token}` },
+      })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((result) => {
+          if (isMounted && result?.success && result.user) {
+            setUser(result.user);
+          }
+        })
+        .catch((err) => console.error("[useAuth] OAuth message error:", err));
+    };
+
+    window.addEventListener("message", handleOAuthMessage);
+    return () => {
+      isMounted = false;
+      window.removeEventListener("message", handleOAuthMessage);
+    };
+  }, []);
+
   // Login
   const login = useCallback(async (username: string, password: string) => {
     try {

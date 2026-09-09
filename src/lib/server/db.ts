@@ -9,12 +9,16 @@ export function getDatabase(): DatabaseSync {
     return dbInstance;
   }
 
-  const dataDir = path.join(process.cwd(), "data");
+  const dbPath =
+    process.env.DATABASE_PATH ||
+    (process.env.VERCEL
+      ? path.join("/tmp", "taskra", "app.db")
+      : path.join(process.cwd(), "data", "app.db"));
+  const dataDir = path.dirname(dbPath);
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
   }
 
-  const dbPath = path.join(dataDir, "app.db");
   dbInstance = new DatabaseSync(dbPath);
 
   // Enable WAL mode for better concurrency

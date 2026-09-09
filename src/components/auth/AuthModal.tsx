@@ -81,9 +81,58 @@ export function AuthModal({
   const handleSocialAuth = (provider: "google" | "facebook") => {
     setError(null);
     setIsSocialLoading(provider);
-    // Direct top-level browser navigation to OAuth redirect endpoint
-    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-    window.location.href = `/api/auth/${provider}`;
+    const popup = window.open(
+      `/api/auth/${provider}`,
+      `taskra-${provider}-login`,
+      "popup,width=520,height=700,resizable=yes,scrollbars=yes",
+    );
+
+    if (!popup) {
+      setIsSocialLoading(null);
+      setError(
+        "The login window was blocked. Please allow popups and try again.",
+      );
+      return;
+    }
+
+    let handled = false;
+    const finish = () => {
+      window.removeEventListener("message", handleMessage);
+      window.clearInterval(closeCheck);
+    };
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin || event.source !== popup) {
+        return;
+      }
+
+      const data = event.data as {
+        type?: string;
+        success?: boolean;
+        error?: string;
+      };
+      if (data.type !== "taskra-oauth" || handled) return;
+
+      handled = true;
+      finish();
+      popup.close();
+      setIsSocialLoading(null);
+      if (data.success) {
+        onClose();
+        onSuccess?.();
+      } else {
+        setError(data.error || "Login failed. Please try again.");
+      }
+    };
+    const closeCheck = window.setInterval(() => {
+      if (popup.closed && !handled) {
+        handled = true;
+        finish();
+        setIsSocialLoading(null);
+        setError("Login was canceled or the login window was closed.");
+      }
+    }, 400);
+
+    window.addEventListener("message", handleMessage);
   };
 
   return (
@@ -132,7 +181,7 @@ export function AuthModal({
           </button>
 
           {/* Facebook Button */}
-          {/* <button
+          <button
             type="button"
             onClick={() => handleSocialAuth("facebook")}
             disabled={Boolean(isSocialLoading) || isSubmitting}
@@ -152,7 +201,7 @@ export function AuthModal({
                 <span>Continue with Facebook</span>
               </>
             )}
-          </button> */}
+          </button>
         </div>
 
         {/* Divider */}
