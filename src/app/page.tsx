@@ -59,11 +59,13 @@ export default function Home() {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isRemoveAllModalOpen, setIsRemoveAllModalOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<
     import("@/lib/engine/types").ComputedOccurrence | null
   >(null);
   const [isRemoving, setIsRemoving] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [mobileTab, setMobileTab] = useState<"tasks" | "analytics">("tasks");
 
   const [leftWidth, setLeftWidth] = useState(460);
@@ -119,9 +121,15 @@ export default function Home() {
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    await clearLocalTasks();
+  const handleConfirmLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      await logout();
+      await clearLocalTasks();
+      setIsLogoutModalOpen(false);
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   const handleAuthSuccess = async () => {
@@ -198,7 +206,7 @@ export default function Home() {
                   </span>
                   <button
                     type="button"
-                    onClick={handleLogout}
+                    onClick={() => setIsLogoutModalOpen(true)}
                     title="Log out from this device"
                     className="ml-1 text-[#8B92A3] hover:text-[#FF6B6B] transition-colors cursor-pointer"
                   >
@@ -342,6 +350,17 @@ export default function Home() {
         confirmText="Remove All Tasks"
         cancelText="Cancel"
         isLoading={isRemoving}
+      />
+
+      <ConfirmModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleConfirmLogout}
+        title="Log out of Taskra?"
+        description="Are you sure you want to log out? Your local tasks will be cleared from this device, while synced data remains available when you sign in again."
+        confirmText="Log Out"
+        loadingText="Logging out..."
+        isLoading={isLoggingOut}
       />
 
       {/* Authentication Modal (Sign In / Register) */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   CalendarDays,
   ChevronLeft,
@@ -40,6 +40,36 @@ export function MonthlyView({
   bestStreak,
 }: MonthlyViewProps) {
   const [selectedDay, setSelectedDay] = useState<DaySummary | null>(null);
+  const [cellSize, setCellSize] = useState(44);
+  const viewRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view) return;
+
+    const updateCellSize = () => {
+      const { width, height } = view.getBoundingClientRect();
+      const horizontalPadding = 24;
+      const verticalChrome = 184;
+      const columnGap = 6;
+      const rowGap = 6;
+      const widthBasedSize = (width - horizontalPadding - columnGap * 6) / 7;
+      const heightBasedSize = (height - verticalChrome - rowGap * 5) / 6;
+      const nextSize = Math.max(
+        30,
+        Math.min(52, widthBasedSize, heightBasedSize),
+      );
+
+      setCellSize((previous) =>
+        Math.abs(previous - nextSize) > 0.5 ? nextSize : previous,
+      );
+    };
+
+    updateCellSize();
+    const observer = new ResizeObserver(updateCellSize);
+    observer.observe(view);
+    return () => observer.disconnect();
+  }, []);
   const summaries = monthCells.filter((cell): cell is DaySummary =>
     Boolean(cell),
   );
@@ -59,10 +89,10 @@ export function MonthlyView({
   ).length;
 
   return (
-    <div className="flex flex-col gap-3 h-full">
+    <div ref={viewRef} className="flex h-full flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <CalendarDays size={16} className="text-[#E8B339]" />
+          <CalendarDays size={16} className="text-[#FF6B6B]" />
           <h3 className="text-sm font-semibold tracking-tight text-[#E4E6EB]">
             Monthly Progress
           </h3>
@@ -109,16 +139,22 @@ export function MonthlyView({
         bestStreak={bestStreak}
       />
 
-      <div className="rounded-[4px] border border-[#2A2E37] bg-[#1C1F26] p-3">
-        <div className="mb-2 grid grid-cols-7 text-center text-[10px] font-semibold uppercase tracking-wider text-[#5C6272]">
+      <div className="rounded-[4px] border border-[#2A2E37] bg-[#1C1F26] p-3 lg:p-2">
+        <div className="mb-2 grid grid-cols-7 text-center text-[10px] font-semibold uppercase tracking-wider text-[#5C6272] lg:mb-1 lg:text-[9px]">
           {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => (
             <span key={`${day}-${index}`}>{day}</span>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-1.5">
+        <div className="grid grid-cols-7 gap-1.5 lg:gap-1">
           {monthCells.map((summary, index) => {
             if (!summary) {
-              return <div key={`empty-${index}`} className="aspect-square" />;
+              return (
+                <div
+                  key={`empty-${index}`}
+                  className="aspect-square"
+                  style={{ height: `${cellSize}px` }}
+                />
+              );
             }
 
             const ratio = summary.totalCount
@@ -139,18 +175,19 @@ export function MonthlyView({
                     setSelectedDay(summary);
                   }
                 }}
-                className={`relative flex aspect-square flex-col items-center justify-center rounded-[3px] border text-[11px] transition-colors ${
+                className={`relative flex aspect-square flex-col items-center justify-center rounded-[3px] border text-[11px] transition-colors lg:aspect-auto lg:text-[10px] ${
                   isPerfect
                     ? "border-[#3DD68C]/50 bg-[#3DD68C]/20 text-[#B8F3D4]"
                     : ratio > 0
                       ? "border-[#E8B339]/40 bg-[#E8B339]/15 text-[#F4D889]"
                       : "border-[#2A2E37] bg-[#14161A] text-[#8B92A3]"
                 } cursor-pointer hover:border-[#5B7FFF] hover:bg-[#5B7FFF]/10 focus:outline-none focus:ring-1 focus:ring-[#5B7FFF] ${isToday ? "ring-1 ring-[#5B7FFF] ring-offset-1 ring-offset-[#1C1F26]" : ""}`}
+                style={{ height: `${cellSize}px` }}
                 title={`${summary.date}: ${summary.completedCount}/${summary.totalCount} completed`}
               >
                 <span className="font-semibold">{summary.dayNumber}</span>
                 {summary.totalCount > 0 && (
-                  <span className="mt-0.5 text-[8px] tabular-nums opacity-80">
+                  <span className="mt-0.5 text-[8px] tabular-nums opacity-80 lg:text-[7px]">
                     {summary.completedCount}/{summary.totalCount}
                   </span>
                 )}

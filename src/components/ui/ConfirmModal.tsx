@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { AlertTriangle, Trash2 } from 'lucide-react';
-import { Modal } from './Modal';
-import { Button } from './Button';
+import React from "react";
+import { AlertTriangle, Trash2 } from "lucide-react";
+import { Modal } from "./Modal";
+import { Button } from "./Button";
 
 export interface ConfirmModalProps {
   isOpen: boolean;
@@ -12,6 +12,7 @@ export interface ConfirmModalProps {
   title: string;
   description: string;
   confirmText?: string;
+  loadingText?: string;
   cancelText?: string;
   isLoading?: boolean;
 }
@@ -22,8 +23,9 @@ export function ConfirmModal({
   onConfirm,
   title,
   description,
-  confirmText = 'Confirm Remove',
-  cancelText = 'Cancel',
+  confirmText = "Confirm Remove",
+  loadingText = "Removing...",
+  cancelText = "Cancel",
   isLoading = false,
 }: ConfirmModalProps) {
   return (
@@ -39,7 +41,12 @@ export function ConfirmModal({
 
         {/* Action Buttons */}
         <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#2A2E37]">
-          <Button type="button" variant="ghost" onClick={onClose} disabled={isLoading}>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onClose}
+            disabled={isLoading}
+          >
             {cancelText}
           </Button>
           <Button
@@ -50,7 +57,7 @@ export function ConfirmModal({
             className="gap-1.5"
           >
             <Trash2 size={13} />
-            <span>{isLoading ? 'Removing...' : confirmText}</span>
+            <span>{isLoading ? loadingText : confirmText}</span>
           </Button>
         </div>
       </div>
