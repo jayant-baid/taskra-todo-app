@@ -64,7 +64,7 @@ export function WeeklyView({
   return (
     <div className="flex flex-col gap-3">
       {/* Weekly Header & Controls */}
-      <div className="flex items-center justify-between pb-1">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <CalendarIcon size={16} className="text-[#5B7FFF]" />
           <h3 className="text-sm font-semibold text-[#E4E6EB] tracking-tight">

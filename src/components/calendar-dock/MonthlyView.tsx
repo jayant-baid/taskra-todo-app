@@ -59,7 +59,7 @@ export function MonthlyView({
   ).length;
 
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="flex flex-col gap-3 h-full">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <CalendarDays size={16} className="text-[#E8B339]" />
