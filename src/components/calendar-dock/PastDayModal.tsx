@@ -61,7 +61,7 @@ export function PastDayModal({ daySummary, onClose }: PastDayModalProps) {
         {/* Section 1: Completed Occurrences */}
         <div className="flex flex-col border border-[#2A2E37] rounded-[3px] overflow-hidden bg-[var(--bg-surface)]">
           <div className="flex items-center justify-between px-3 py-2 bg-[var(--bg-surface-subtle)] border-b border-[#2A2E37]">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-[#003900]">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-green)]">
               <CheckCircle2 size={13} />
               <span>Completed ({completedOccurrences.length})</span>
             </div>

@@ -38,7 +38,7 @@ export default function Home() {
     toggleOccurrence,
     deleteTask,
     removeAllTasks,
-    refreshFromDB,
+    syncWithServer,
     clearLocalTasks,
     goToPreviousWeek,
     goToNextWeek,
@@ -148,7 +148,7 @@ export default function Home() {
   };
 
   const handleAuthSuccess = async () => {
-    await refreshFromDB();
+    await syncWithServer();
   };
 
   return (
