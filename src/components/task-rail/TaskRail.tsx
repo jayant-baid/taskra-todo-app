@@ -16,6 +16,7 @@ export interface TaskRailProps {
   onEdit: (occurrence: ComputedOccurrence) => void;
   onOpenAddModal: () => void;
   carryOverCount: number;
+  isBeforeTaskDayStart?: boolean;
   isReadOnly?: boolean;
 }
 
@@ -29,8 +30,12 @@ export function TaskRail({
   onEdit,
   onOpenAddModal,
   carryOverCount,
+  isBeforeTaskDayStart = false,
   isReadOnly = false,
 }: TaskRailProps) {
+  const primaryTitle = isBeforeTaskDayStart ? "Yesterday" : "Today";
+  const secondaryTitle = isBeforeTaskDayStart ? "Today" : "Tomorrow";
+
   return (
     <div className="flex flex-col h-full overflow-y-auto pr-1">
       {/* Rail Top Action Bar */}
@@ -73,27 +78,28 @@ export function TaskRail({
       {/* Today Section */}
       <div className="flex flex-col gap-4">
         <TaskSection
-          title="Today"
+          title={primaryTitle}
           subtitle={formatDisplayDate(todayStr)}
           occurrences={todayOccurrences}
           onToggle={onToggle}
           onDelete={onDelete}
           onEdit={onEdit}
           isReadOnly={isReadOnly}
-          emptyText="No tasks scheduled for today. Create one with [+ Add New Task] or press Ctrl + N key."
+          emptyText={`No tasks scheduled for ${primaryTitle.toLowerCase()}. Create one with [+ Add New Task] or press Ctrl + N key.`}
         />
 
-        {/* Tomorrow Section */}
-        <TaskSection
-          title="Tomorrow"
-          subtitle={formatDisplayDate(tomorrowStr)}
-          occurrences={tomorrowOccurrences}
-          onToggle={onToggle}
-          onDelete={onDelete}
-          onEdit={onEdit}
-          isReadOnly={isReadOnly}
-          emptyText="No tasks scheduled for tomorrow."
-        />
+        {isBeforeTaskDayStart && (
+          <TaskSection
+            title={secondaryTitle}
+            subtitle={formatDisplayDate(tomorrowStr)}
+            occurrences={tomorrowOccurrences}
+            onToggle={onToggle}
+            onDelete={onDelete}
+            onEdit={onEdit}
+            isReadOnly={isReadOnly}
+            emptyText="No tasks scheduled for today."
+          />
+        )}
       </div>
     </div>
   );

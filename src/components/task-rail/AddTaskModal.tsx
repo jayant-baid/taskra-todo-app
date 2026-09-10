@@ -21,7 +21,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/Popover";
-import { getLocalDateString } from "@/lib/engine/dateUtils";
+import { getTaskDateString } from "@/lib/engine/dateUtils";
 
 export interface AddTaskModalProps {
   isOpen: boolean;
@@ -42,7 +42,7 @@ export function AddTaskModal({
   onSave,
   taskToEdit,
 }: AddTaskModalProps) {
-  const today = getLocalDateString();
+  const today = getTaskDateString();
 
   const [title, setTitle] = useState(taskToEdit?.title || "");
   const [description, setDescription] = useState(taskToEdit?.description || "");

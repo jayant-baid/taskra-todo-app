@@ -3,7 +3,12 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { db, clearAllLocalData } from "../db/dexie";
 import { TaskDefinition, TaskOccurrence } from "../engine/types";
-import { getLocalDateString, addDays, getWeekDays } from "../engine/dateUtils";
+import {
+  getTaskDateString,
+  isBeforeTaskDayStart,
+  addDays,
+  getWeekDays,
+} from "../engine/dateUtils";
 import {
   computeOccurrencesForDate,
   computeDaySummary,
@@ -22,15 +27,44 @@ export function useTasks() {
   const [taskDefinitions, setTaskDefinitions] = useState<TaskDefinition[]>([]);
   const [taskOccurrences, setTaskOccurrences] = useState<TaskOccurrence[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeWeekCenterDate, setActiveWeekCenterDate] =
-    useState<string>(getLocalDateString());
+  const [taskDayStr, setTaskDayStr] = useState<string>(() =>
+    getTaskDateString(),
+  );
+  const [isBeforeDayStart, setIsBeforeDayStart] = useState(() =>
+    isBeforeTaskDayStart(),
+  );
+  const [activeWeekCenterDate, setActiveWeekCenterDate] = useState<string>(() =>
+    getTaskDateString(),
+  );
   const [activeMonthStr, setActiveMonthStr] = useState<string>(() => {
-    const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    return getTaskDateString().slice(0, 7);
   });
 
-  const todayStr = useMemo(() => getLocalDateString(), []);
+  const todayStr = taskDayStr;
   const tomorrowStr = useMemo(() => addDays(todayStr, 1), [todayStr]);
+
+  // Keep the logical task day stable overnight and roll it forward at 4:00 AM.
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const scheduleNextBoundary = () => {
+      const now = new Date();
+      const nextBoundary = new Date(now);
+      nextBoundary.setHours(4, 0, 0, 0);
+      if (nextBoundary <= now) {
+        nextBoundary.setDate(nextBoundary.getDate() + 1);
+      }
+
+      timeoutId = setTimeout(() => {
+        setTaskDayStr(getTaskDateString());
+        setIsBeforeDayStart(isBeforeTaskDayStart());
+        scheduleNextBoundary();
+      }, nextBoundary.getTime() - now.getTime());
+    };
+
+    scheduleNextBoundary();
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   // Load all tasks & occurrences from Dexie
   const refreshFromDB = useCallback(async () => {
@@ -402,6 +436,7 @@ export function useTasks() {
 
   return {
     todayStr,
+    isBeforeTaskDayStart: isBeforeDayStart,
     tomorrowStr,
     activeWeekCenterDate,
     todayOccurrences,

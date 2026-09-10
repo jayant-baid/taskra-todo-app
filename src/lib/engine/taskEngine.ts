@@ -6,7 +6,7 @@ import {
   AnalyticsMetrics,
 } from "./types";
 import {
-  getLocalDateString,
+  getTaskDateString,
   getLocalDateFromISO,
   getDaysDifference,
   parseLocalDate,
@@ -23,7 +23,7 @@ export function computeOccurrencesForDate(
   targetDateStr: string,
   taskDefinitions: TaskDefinition[],
   persistedOccurrences: TaskOccurrence[],
-  todayStr: string = getLocalDateString(),
+  todayStr: string = getTaskDateString(),
 ): ComputedOccurrence[] {
   // Index persisted occurrences by taskDefinitionId + date
   const occurrenceMap = new Map<string, TaskOccurrence>();
@@ -184,7 +184,7 @@ export function computeDaySummary(
   dateStr: string,
   taskDefinitions: TaskDefinition[],
   persistedOccurrences: TaskOccurrence[],
-  todayStr: string = getLocalDateString(),
+  todayStr: string = getTaskDateString(),
 ): DaySummary {
   const occurrences = computeOccurrencesForDate(
     dateStr,
@@ -225,7 +225,7 @@ export function computeDaySummary(
 export function computeAnalytics(
   taskDefinitions: TaskDefinition[],
   persistedOccurrences: TaskOccurrence[],
-  todayStr: string = getLocalDateString(),
+  todayStr: string = getTaskDateString(),
 ): AnalyticsMetrics {
   const activeDefinitions = taskDefinitions.filter(
     (t) => t.status === "active",
@@ -343,7 +343,7 @@ export function computeMonthlyData(
   yearMonth: string, // 'YYYY-MM'
   taskDefinitions: TaskDefinition[],
   persistedOccurrences: TaskOccurrence[],
-  todayStr: string = getLocalDateString(),
+  todayStr: string = getTaskDateString(),
 ): (DaySummary | null)[] {
   const [year, month] = yearMonth.split("-").map(Number);
   const firstDay = new Date(year, month - 1, 1);

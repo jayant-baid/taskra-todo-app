@@ -4,7 +4,7 @@
  */
 
 export function padZero(num: number): string {
-  return num.toString().padStart(2, '0');
+  return num.toString().padStart(2, "0");
 }
 
 /**
@@ -18,10 +18,25 @@ export function getLocalDateString(date: Date = new Date()): string {
 }
 
 /**
+ * Returns the app's task date. A task day runs from 4:00 AM through 3:59 AM.
+ */
+export function getTaskDateString(date: Date = new Date()): string {
+  const taskDate = new Date(date);
+  if (taskDate.getHours() < 4) {
+    taskDate.setDate(taskDate.getDate() - 1);
+  }
+  return getLocalDateString(taskDate);
+}
+
+export function isBeforeTaskDayStart(date: Date = new Date()): boolean {
+  return date.getHours() < 4;
+}
+
+/**
  * Parses YYYY-MM-DD string into a Date object set at local midnight.
  */
 export function parseLocalDate(dateStr: string): Date {
-  const parts = dateStr.split('-').map((p) => parseInt(p, 10));
+  const parts = dateStr.split("-").map((p) => parseInt(p, 10));
   if (parts.length !== 3 || parts.some(isNaN)) {
     return new Date();
   }
@@ -41,7 +56,10 @@ export function addDays(dateStr: string, days: number): string {
  * Calculates calendar day difference (targetDateStr - baseDateStr).
  * Positive if targetDateStr is after baseDateStr.
  */
-export function getDaysDifference(baseDateStr: string, targetDateStr: string): number {
+export function getDaysDifference(
+  baseDateStr: string,
+  targetDateStr: string,
+): number {
   const base = parseLocalDate(baseDateStr);
   const target = parseLocalDate(targetDateStr);
   const diffTime = target.getTime() - base.getTime();
@@ -59,30 +77,30 @@ export function getLocalDateFromISO(isoString: string): string {
 
 export function formatShortDay(dateStr: string): string {
   const d = parseLocalDate(dateStr);
-  return d.toLocaleDateString('en-US', { weekday: 'short' });
+  return d.toLocaleDateString("en-US", { weekday: "short" });
 }
 
 export function formatShortMonth(dateStr: string): string {
   const d = parseLocalDate(dateStr);
-  return d.toLocaleDateString('en-US', { month: 'short' });
+  return d.toLocaleDateString("en-US", { month: "short" });
 }
 
 export function formatDisplayDate(dateStr: string): string {
   const d = parseLocalDate(dateStr);
-  return d.toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
+  return d.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
   });
 }
 
 export function formatFullDate(dateStr: string): string {
   const d = parseLocalDate(dateStr);
-  return d.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  return d.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 }
 
@@ -90,17 +108,20 @@ export function formatFullDate(dateStr: string): string {
  * Returns an array of 7 consecutive dates (YYYY-MM-DD) for the week containing the given date.
  * Starts from Monday (or Sunday if preferred). Standard ops dashboard starts Monday.
  */
-export function getWeekDays(centerDateStr: string, startOnMonday = true): string[] {
+export function getWeekDays(
+  centerDateStr: string,
+  startOnMonday = true,
+): string[] {
   const date = parseLocalDate(centerDateStr);
   const day = date.getDay(); // 0 is Sunday, 1 is Monday...
-  
+
   let diffToStart = 0;
   if (startOnMonday) {
     diffToStart = day === 0 ? -6 : 1 - day;
   } else {
     diffToStart = -day;
   }
-  
+
   const startDateStr = addDays(centerDateStr, diffToStart);
   const weekDays: string[] = [];
   for (let i = 0; i < 7; i++) {

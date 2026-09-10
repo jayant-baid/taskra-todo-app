@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/Button";
 export default function Home() {
   const {
     todayStr,
+    isBeforeTaskDayStart,
     tomorrowStr,
     todayOccurrences,
     tomorrowOccurrences,
@@ -70,6 +71,8 @@ export default function Home() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [mobileTab, setMobileTab] = useState<"tasks" | "analytics">("tasks");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  const taskTabLabel = isBeforeTaskDayStart ? "Yesterday & Today" : "Today";
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -296,7 +299,7 @@ export default function Home() {
             }`}
           >
             <CheckSquare size={13} />
-            <span>Today & Tomorrow</span>
+            <span>{taskTabLabel}</span>
           </button>
           <button
             type="button"
@@ -331,6 +334,7 @@ export default function Home() {
               tomorrowStr={tomorrowStr}
               todayOccurrences={todayOccurrences}
               tomorrowOccurrences={tomorrowOccurrences}
+              isBeforeTaskDayStart={isBeforeTaskDayStart}
               onToggle={toggleOccurrence}
               onDelete={deleteTask}
               onEdit={(occurrence) => {
