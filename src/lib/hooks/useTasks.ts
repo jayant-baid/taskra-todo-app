@@ -20,8 +20,16 @@ import {
   queueSyncItem,
   initBackgroundSync,
   flushSyncQueue,
+  fetchTaskReport,
   pullServerState,
+  TaskReport,
 } from "../sync/syncManager";
+
+function getMonthDateRange(monthStr: string): [string, string] {
+  const [year, month] = monthStr.split("-").map(Number);
+  const lastDay = new Date(year, month, 0).getDate();
+  return [monthStr + "-01", `${monthStr}-${String(lastDay).padStart(2, "0")}`];
+}
 
 export function useTasks() {
   const [taskDefinitions, setTaskDefinitions] = useState<TaskDefinition[]>([]);
@@ -39,6 +47,8 @@ export function useTasks() {
   const [activeMonthStr, setActiveMonthStr] = useState<string>(() => {
     return getTaskDateString().slice(0, 7);
   });
+  const [weeklyReport, setWeeklyReport] = useState<TaskReport | null>(null);
+  const [monthlyReport, setMonthlyReport] = useState<TaskReport | null>(null);
 
   const todayStr = taskDayStr;
   const tomorrowStr = useMemo(() => addDays(todayStr, 1), [todayStr]);
@@ -69,6 +79,8 @@ export function useTasks() {
   // Load all tasks & occurrences from Dexie
   const refreshFromDB = useCallback(async () => {
     try {
+      setWeeklyReport(null);
+      setMonthlyReport(null);
       const defs = await db.taskDefinitions.toArray();
       const occs = await db.taskOccurrences.toArray();
       setTaskDefinitions(defs);
@@ -92,6 +104,37 @@ export function useTasks() {
       console.warn("[useTasks] Server sync error:", err);
     }
   }, [refreshFromDB]);
+
+  // Reports use a bounded server query so sync does not need to download history.
+  useEffect(() => {
+    let isMounted = true;
+    const weekDates = getWeekDays(activeWeekCenterDate, true);
+
+    void fetchTaskReport(
+      weekDates[0],
+      weekDates[weekDates.length - 1],
+      todayStr,
+    ).then((report) => {
+      if (isMounted) setWeeklyReport(report);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [activeWeekCenterDate, todayStr]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const [startDate, endDate] = getMonthDateRange(activeMonthStr);
+
+    void fetchTaskReport(startDate, endDate, todayStr).then((report) => {
+      if (isMounted) setMonthlyReport(report);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [activeMonthStr, todayStr]);
 
   // Reset local state (called on logout or account switch)
   const clearLocalTasks = useCallback(async () => {
@@ -153,6 +196,8 @@ export function useTasks() {
       recurrenceRule?: "daily" | "weekly";
       startDate?: string;
     }) => {
+      setWeeklyReport(null);
+      setMonthlyReport(null);
       const now = new Date();
       const effectiveStartDate = params.startDate || todayStr;
 
@@ -195,6 +240,8 @@ export function useTasks() {
         startDate?: string;
       },
     ) => {
+      setWeeklyReport(null);
+      setMonthlyReport(null);
       const task = taskDefinitions.find((t) => t.id === taskDefId);
       if (!task) return;
 
@@ -236,6 +283,8 @@ export function useTasks() {
   // Toggle Occurrence Completion
   const toggleOccurrence = useCallback(
     async (taskDefId: string, dateStr: string) => {
+      setWeeklyReport(null);
+      setMonthlyReport(null);
       const key = `${taskDefId}_${dateStr}`;
       const existingOcc = taskOccurrences.find(
         (o) => o.taskDefinitionId === taskDefId && o.date === dateStr,
@@ -278,6 +327,8 @@ export function useTasks() {
   // Delete Individual Task with correct semantics (§3.3)
   const deleteTask = useCallback(
     async (taskDefId: string) => {
+      setWeeklyReport(null);
+      setMonthlyReport(null);
       const task = taskDefinitions.find((t) => t.id === taskDefId);
       if (!task) return;
 
@@ -324,6 +375,8 @@ export function useTasks() {
 
   // Remove All Data (Removes all active today & upcoming tasks, preserving past records)
   const removeAllTasks = useCallback(async () => {
+    setWeeklyReport(null);
+    setMonthlyReport(null);
     // Soft delete all active definitions from today onward
     const activeTasks = taskDefinitions.filter((t) => t.status === "active");
     if (activeTasks.length === 0) return;
@@ -367,26 +420,65 @@ export function useTasks() {
 
   // Derived: Week summaries for the Calendar view
   const weekSummaries = useMemo(() => {
+    if (
+      weeklyReport?.startDate === getWeekDays(activeWeekCenterDate, true)[0] &&
+      weeklyReport.endDate === getWeekDays(activeWeekCenterDate, true)[6]
+    ) {
+      return weeklyReport.summaries;
+    }
+
     const weekDates = getWeekDays(activeWeekCenterDate, true);
     return weekDates.map((dateStr) =>
       computeDaySummary(dateStr, taskDefinitions, taskOccurrences, todayStr),
     );
-  }, [activeWeekCenterDate, taskDefinitions, taskOccurrences, todayStr]);
+  }, [
+    activeWeekCenterDate,
+    taskDefinitions,
+    taskOccurrences,
+    todayStr,
+    weeklyReport,
+  ]);
 
   // Derived: Monthly progress grid for the calendar dock
   const monthlyData = useMemo(() => {
+    const [startDate, endDate] = getMonthDateRange(activeMonthStr);
+    if (
+      monthlyReport?.startDate === startDate &&
+      monthlyReport.endDate === endDate
+    ) {
+      const [year, month] = activeMonthStr.split("-").map(Number);
+      const firstDay = new Date(year, month - 1, 1);
+      const leadingBlanks = (firstDay.getDay() + 6) % 7;
+      const cells: (typeof monthlyReport.summaries[number] | null)[] = [
+        ...Array<null>(leadingBlanks).fill(null),
+        ...monthlyReport.summaries,
+      ];
+      while (cells.length % 7 !== 0) cells.push(null);
+      return cells;
+    }
+
     return computeMonthlyData(
       activeMonthStr,
       taskDefinitions,
       taskOccurrences,
       todayStr,
     );
-  }, [activeMonthStr, taskDefinitions, taskOccurrences, todayStr]);
+  }, [
+    activeMonthStr,
+    taskDefinitions,
+    taskOccurrences,
+    todayStr,
+    monthlyReport,
+  ]);
 
   // Derived: Overall Analytics metrics
   const analytics = useMemo(() => {
+    if (weeklyReport?.taskDate === todayStr) {
+      return weeklyReport.analytics;
+    }
+
     return computeAnalytics(taskDefinitions, taskOccurrences, todayStr);
-  }, [taskDefinitions, taskOccurrences, todayStr]);
+  }, [taskDefinitions, taskOccurrences, todayStr, weeklyReport]);
 
   // Helper to query occurrences for any custom date (e.g. when opening past day modal)
   const getOccurrencesForDate = useCallback(

@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/server/auth";
 import { query, withTransaction } from "@/lib/server/db";
 import { TaskDefinition, TaskOccurrence } from "@/lib/engine/types";
+import { addDays } from "@/lib/engine/dateUtils";
+
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 export async function GET(request: Request) {
   try {
@@ -14,14 +17,20 @@ export async function GET(request: Request) {
         },
         { status: 401 },
       );
+    const taskDate = new URL(request.url).searchParams.get("taskDate");
+    const hasTaskDate = Boolean(taskDate && DATE_PATTERN.test(taskDate));
+    const occurrenceStart = hasTaskDate ? addDays(taskDate!, -1) : null;
+    const occurrenceEnd = hasTaskDate ? addDays(taskDate!, 1) : null;
     const [rawTasks, rawOccurrences] = await Promise.all([
       query(
-        "SELECT id, title, description, is_recurring, recurrence_rule, start_date, created_at, deleted_from, status FROM task_definitions WHERE user_id = ?",
+        "SELECT id, title, description, is_recurring, recurrence_rule, start_date, created_at, deleted_from, status FROM task_definitions WHERE user_id = ? AND status = 'active'",
         [user.id],
       ),
       query(
-        "SELECT id, task_definition_id, date, status, completed_at, updated_at FROM task_occurrences WHERE user_id = ?",
-        [user.id],
+        hasTaskDate
+          ? "SELECT id, task_definition_id, date, status, completed_at, updated_at FROM task_occurrences WHERE user_id = ? AND date >= ? AND date <= ?"
+          : "SELECT id, task_definition_id, date, status, completed_at, updated_at FROM task_occurrences WHERE user_id = ?",
+        hasTaskDate ? [user.id, occurrenceStart, occurrenceEnd] : [user.id],
       ),
     ]);
     const tasks: TaskDefinition[] = rawTasks.map((task) => ({

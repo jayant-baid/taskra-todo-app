@@ -1,5 +1,7 @@
 import { db, SyncQueueItem } from "../db/dexie";
 import { getClientToken } from "../hooks/useAuth";
+import { AnalyticsMetrics, DaySummary } from "../engine/types";
+import { getTaskDateString } from "../engine/dateUtils";
 
 /**
  * Sync Manager handles queueing local mutations and syncing with the server.
@@ -7,6 +9,14 @@ import { getClientToken } from "../hooks/useAuth";
  */
 
 let isSyncing = false;
+
+export interface TaskReport {
+  startDate: string;
+  endDate: string;
+  taskDate: string;
+  summaries: DaySummary[];
+  analytics: AnalyticsMetrics;
+}
 
 export async function queueSyncItem(
   action: SyncQueueItem["action"],
@@ -37,7 +47,8 @@ export async function pullServerState(): Promise<{
   }
 
   try {
-    const res = await fetch("/api/sync", {
+    const params = new URLSearchParams({ taskDate: getTaskDateString() });
+    const res = await fetch(`/api/sync?${params.toString()}`, {
       headers,
       credentials: "include",
       cache: "no-store",
@@ -71,6 +82,34 @@ export async function pullServerState(): Promise<{
   } catch (err) {
     console.warn("[SyncManager] Pull from server failed:", err);
     return { success: false, updated: false };
+  }
+}
+
+export async function fetchTaskReport(
+  startDate: string,
+  endDate: string,
+  taskDate: string,
+): Promise<TaskReport | null> {
+  if (typeof window === "undefined") return null;
+
+  const token = getClientToken();
+  const headers: Record<string, string> = {};
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  try {
+    const params = new URLSearchParams({ startDate, endDate, taskDate });
+    const res = await fetch(`/api/reports?${params.toString()}`, {
+      headers,
+      credentials: "include",
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+
+    const data = (await res.json()) as TaskReport & { success?: boolean };
+    return data.success ? data : null;
+  } catch (err) {
+    console.warn("[SyncManager] Task report request failed:", err);
+    return null;
   }
 }
 
