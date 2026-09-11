@@ -81,7 +81,7 @@ export default function AdminPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-[var(--bg-app)] p-6 text-[var(--text-primary)]">
+      <main className="h-full overflow-y-auto bg-[var(--bg-app)] p-6 text-[var(--text-primary)]">
         <div className="mx-auto max-w-xl rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 text-center">
           <ShieldCheck
             className="mx-auto mb-3 text-[var(--status-danger)]"
@@ -102,7 +102,7 @@ export default function AdminPage() {
 
   if (!overview) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[var(--bg-app)] text-sm text-[var(--text-secondary)]">
+      <main className="flex h-full overflow-y-auto items-center justify-center bg-[var(--bg-app)] text-sm text-[var(--text-secondary)]">
         Loading admin overview...
       </main>
     );
@@ -122,7 +122,7 @@ export default function AdminPage() {
   ] as const;
 
   return (
-    <main className="min-h-screen overflow-y-auto bg-[var(--bg-app)] p-4 text-[var(--text-primary)] sm:p-8">
+    <main className="h-full overflow-y-auto bg-[var(--bg-app)] p-4 text-[var(--text-primary)] sm:p-8">
       <div className="mx-auto max-w-7xl">
         <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
