@@ -1,8 +1,14 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Flame, TrendingUp, RefreshCw, Layers, CheckCircle } from 'lucide-react';
-import { AnalyticsMetrics } from '@/lib/engine/types';
+import React from "react";
+import {
+  Flame,
+  TrendingUp,
+  RefreshCw,
+  Layers,
+  CheckCircle,
+} from "lucide-react";
+import { AnalyticsMetrics } from "@/lib/engine/types";
 
 export interface AnalyticsSummaryProps {
   analytics: AnalyticsMetrics;
@@ -33,13 +39,18 @@ export function AnalyticsSummary({ analytics }: AnalyticsSummaryProps) {
         <div className="p-3 bg-[#1C1F26] border border-[#2A2E37] rounded-[3px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-[#8B92A3] mb-1">
             <span className="text-[11px] font-medium">Daily Streak</span>
-            <Flame size={14} className={currentStreak > 0 ? 'text-[#E8B339]' : 'text-[#5C6272]'} />
+            <Flame
+              size={14}
+              className={
+                currentStreak > 0 ? "text-[#E8B339]" : "text-[#5C6272]"
+              }
+            />
           </div>
           <div className="flex items-baseline gap-1.5">
             <span className="text-xl font-bold text-[#E4E6EB] tabular-nums tracking-tight">
               {currentStreak}
             </span>
-            <span className="text-xs text-[#8B92A3]">days (100%)</span>
+            <span className="text-xs text-[#8B92A3]">days (50%+)</span>
           </div>
           <div className="mt-1 text-[10px] text-[#5C6272] tabular-nums">
             Best streak: {bestStreak}d
@@ -84,12 +95,17 @@ export function AnalyticsSummary({ analytics }: AnalyticsSummaryProps) {
         <div className="p-3 bg-[#1C1F26] border border-[#2A2E37] rounded-[3px] flex flex-col justify-between">
           <div className="flex items-center justify-between text-[#8B92A3] mb-1">
             <span className="text-[11px] font-medium">Rolled Forward</span>
-            <Layers size={14} className={carryOverCount > 0 ? 'text-[#E8B339]' : 'text-[#5C6272]'} />
+            <Layers
+              size={14}
+              className={
+                carryOverCount > 0 ? "text-[#E8B339]" : "text-[#5C6272]"
+              }
+            />
           </div>
           <div className="flex items-baseline gap-1.5">
             <span
               className={`text-xl font-bold tabular-nums tracking-tight ${
-                carryOverCount > 0 ? 'text-[#E8B339]' : 'text-[#E4E6EB]'
+                carryOverCount > 0 ? "text-[#E8B339]" : "text-[#E4E6EB]"
               }`}
             >
               {carryOverCount}

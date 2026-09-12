@@ -77,6 +77,8 @@ export function CalendarDock({
           onNextWeek={onNextWeek}
           onCurrentWeek={onCurrentWeek}
           onSelectToday={onSelectToday}
+          currentStreak={analytics.currentStreak}
+          bestStreak={analytics.bestStreak}
         />
       ) : (
         <MonthlyView
@@ -85,10 +87,12 @@ export function CalendarDock({
           onPrevMonth={onPrevMonth}
           onNextMonth={onNextMonth}
           onCurrentMonth={onCurrentMonth}
+          currentStreak={analytics.currentStreak}
+          bestStreak={analytics.bestStreak}
         />
       )}
 
-      <AnalyticsSummary analytics={analytics} />
+      {/* <AnalyticsSummary analytics={analytics} /> */}
     </div>
   );
 }

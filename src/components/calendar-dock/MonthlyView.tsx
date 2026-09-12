@@ -10,6 +10,7 @@ import {
 import { DaySummary } from "@/lib/engine/types";
 import { Button } from "@/components/ui/Button";
 import { PastDayModal } from "./PastDayModal";
+import { ProgressSummaryCards } from "./ProgressSummaryCards";
 
 export interface MonthlyViewProps {
   monthStr: string;
@@ -17,6 +18,8 @@ export interface MonthlyViewProps {
   onPrevMonth: () => void;
   onNextMonth: () => void;
   onCurrentMonth: () => void;
+  currentStreak: number;
+  bestStreak: number;
 }
 
 function formatMonth(monthStr: string): string {
@@ -33,6 +36,8 @@ export function MonthlyView({
   onPrevMonth,
   onNextMonth,
   onCurrentMonth,
+  currentStreak,
+  bestStreak,
 }: MonthlyViewProps) {
   const [selectedDay, setSelectedDay] = useState<DaySummary | null>(null);
   const summaries = monthCells.filter((cell): cell is DaySummary =>
@@ -52,20 +57,22 @@ export function MonthlyView({
   );
   const completionRate =
     totalTasks > 0 ? Math.round((totalCompleted / totalTasks) * 100) : 0;
+  const perfectDays = summaries.filter(
+    (summary) =>
+      summary.totalCount > 0 && summary.completedCount === summary.totalCount,
+  ).length;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 h-full">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <CalendarDays size={16} className="text-[#E8B339]" />
-          <div>
-            <h3 className="text-sm font-semibold tracking-tight text-[#E4E6EB]">
-              Monthly Progress
-            </h3>
-            <p className="text-[11px] text-[#8B92A3]">
-              {formatMonth(monthStr)}
-            </p>
-          </div>
+          <h3 className="text-sm font-semibold tracking-tight text-[#E4E6EB]">
+            Monthly Progress
+          </h3>
+          <span className="text-xs text-[#8B92A3]">
+            {formatMonth(monthStr)}
+          </span>
         </div>
         <div className="flex items-center gap-1">
           <Button
@@ -97,32 +104,14 @@ export function MonthlyView({
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
-        <div className="border border-[#2A2E37] bg-[#1C1F26] p-2.5 rounded-[3px]">
-          <p className="text-[10px] uppercase tracking-wider text-[#8B92A3]">
-            Completion
-          </p>
-          <p className="mt-1 text-lg font-bold tabular-nums text-[#E8B339]">
-            {completionRate}%
-          </p>
-        </div>
-        <div className="border border-[#2A2E37] bg-[#1C1F26] p-2.5 rounded-[3px]">
-          <p className="text-[10px] uppercase tracking-wider text-[#8B92A3]">
-            Perfect days
-          </p>
-          <p className="mt-1 text-lg font-bold tabular-nums text-[#3DD68C]">
-            {completedDays}
-          </p>
-        </div>
-        <div className="border border-[#2A2E37] bg-[#1C1F26] p-2.5 rounded-[3px]">
-          <p className="text-[10px] uppercase tracking-wider text-[#8B92A3]">
-            Completed
-          </p>
-          <p className="mt-1 text-lg font-bold tabular-nums text-[#E4E6EB]">
-            {totalCompleted}
-          </p>
-        </div>
-      </div>
+      <ProgressSummaryCards
+        completionRate={completionRate}
+        perfectDays={perfectDays}
+        completedTasks={totalCompleted}
+        periodLabel="monthly"
+        currentStreak={currentStreak}
+        bestStreak={bestStreak}
+      />
 
       <div className="rounded-[4px] border border-[#2A2E37] bg-[#1C1F26] p-3">
         <div className="mb-2 grid grid-cols-7 text-center text-[10px] font-semibold uppercase tracking-wider text-[#5C6272]">
